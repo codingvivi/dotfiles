@@ -5,11 +5,14 @@
 # ============================================
 #  2. UN-IGNORES
 # ============================================
-.DS
 !.gitignore
+
 !.config/
 !.config/nvim/
 !.config/nvim/**
+
+!.hammerspoon/
+!.hammerspoon/**
 
 # ============================================
 #  3. GLOBAL RE-IGNORES
