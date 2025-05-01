@@ -1,0 +1,12 @@
+# Lines starting with # are comments
+# thanks moon
+
+# doesn't set the file time to the past
+--no-mtime
+
+# gets rid of the id crap from the name
+-o ./%(title)s.%(ext)s
+
+# automatically prefers best video and audio
+-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+

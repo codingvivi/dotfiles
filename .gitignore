@@ -8,8 +8,15 @@
 !.gitignore
 
 !.config/
+
 !.config/nvim/
 !.config/nvim/**
+
+!.config/yt-dlp/
+!.config/yt-dlp/config
+
+!.config/karabiner/
+!.config/karabiner/**
 
 !.hammerspoon/
 !.hammerspoon/**

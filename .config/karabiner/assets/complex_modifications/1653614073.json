@@ -1,0 +1,1 @@
+{"title":"` (alone) = Escape","rules":[{"description":"` (alone) = Escape","manipulators":[{"type":"basic","from":{"key_code":"grave_accent_and_tilde"},"to_if_alone":[{"repeat":true,"key_code":"escape"}]}]}]}
