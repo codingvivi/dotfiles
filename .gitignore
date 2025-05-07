@@ -9,8 +9,13 @@
 
 !.config/
 
+!.config/kitty/
+!.config/kitty/kitty.conf
+
 !.config/nvim/
 !.config/nvim/**
+!.config/neovide/
+!.config/neovide/config.config.toml
 
 !.config/yt-dlp/
 !.config/yt-dlp/config
@@ -18,9 +23,13 @@
 !.config/karabiner/
 !.config/karabiner/**
 
+!.doom.d/
+!.doom.d/**
+
 !.hammerspoon/
 !.hammerspoon/**
 
+!.zshrc
 # ============================================
 #  3. GLOBAL RE-IGNORES
 # ============================================
