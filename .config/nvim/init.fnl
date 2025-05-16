@@ -1,7 +1,0 @@
-(require :config.globals)
-(require :config.neovide)
-(require :config.lazy)
-(require :config.options)
-(require :config.autocomplete)
-(require :config.lsp)
-(require :config.keymaps)

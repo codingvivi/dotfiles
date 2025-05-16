@@ -1,0 +1,3 @@
+[submodule ".config/neovivi"]
+	path = .config/nvim
+	url = git@github.com:codingvivi/neovivi.git
