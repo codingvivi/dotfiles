@@ -12,6 +12,10 @@
 !.config/kitty/
 !.config/kitty/kitty.conf
 
+!.config/ghostty/
+!.config/ghostty/**
+
+
 !.config/nvim/
 !.config/nvim/**
 !.config/neovide/
