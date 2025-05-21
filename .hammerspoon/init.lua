@@ -1,2 +1,9 @@
-require("hs.ipc")
-hs.doc.builder.genComments('/Applications/Hammerspoon.app/Contents/Resources/extensions/hs')
+package.path =
+package.path .. ";" .. os.getenv("HOME") .. "/.hammerspoon/?.lua"
+
+fennel = require('fennel')
+fennel.path =
+  package.path .. ";" .. os.getenv("HOME") .. "/.hammerspoon/?.fnl"
+table.insert(package.loaders or package.searchers, fennel.searcher)
+
+require 'main'
