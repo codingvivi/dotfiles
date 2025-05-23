@@ -27,11 +27,17 @@
 !.config/karabiner/
 !.config/karabiner/**
 
+!.config/zellij
+!.config/zellij/**
+
 !.doom.d/
 !.doom.d/**
 
 !.hammerspoon/
 !.hammerspoon/**
+
+
+!.tmux.conf
 
 !.zshrc
 # ============================================

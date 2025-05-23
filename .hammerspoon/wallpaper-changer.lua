@@ -1,7 +1,10 @@
--- :fennel:1747926215
-print("wallpaper script:")
+-- :fennel:1747928376
 local wallpaper_folder = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
 local supported_UTIs = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
+print("UTIs supported:")
+for _, UTI in ipairs(supported_UTIs) do
+  print(UTI)
+end
 local function hassupportedUTI_3f(UTI_list, path)
   for _, UTI in ipairs(UTI_list) do
     if (UTI == hs.fs.fileUTI(path)) then
@@ -9,7 +12,7 @@ local function hassupportedUTI_3f(UTI_list, path)
     else
     end
   end
-  return nil
+  return false
 end
 local function print_file_list(file_list)
   for _, file in ipairs(file_list) do
@@ -27,76 +30,99 @@ local function list_supported_files(UTIs, file_paths)
   end
   return file_list
 end
-local function update_file_index(file_list, index)
+local function calculate_next_index(file_list, current_idx)
   local image_list_length = #file_list
-  print(("Number of files available:" .. image_list_length))
-  print(("Current index position:" .. index))
   local _3_ = true
   local and_4_ = true
   if and_4_ then
     local _ = _3_
-    and_4_ = not file_list
+    and_4_ = (not file_list or (0 == image_list_length))
   end
   if and_4_ then
     local _ = _3_
-    print("Error: file-list is nil (or false). Somewhere something went wrong...")
-    return 0
+    print("Error: No images found in file-list or file-list is nil.")
+    return nil
   else
     local and_6_ = true
     if and_6_ then
       local _ = _3_
-      and_6_ = (0 == image_list_length)
+      and_6_ = (not current_idx or (current_idx <= 0) or (current_idx > image_list_length))
     end
     if and_6_ then
       local _ = _3_
-      print("Error: no images found")
-      return 0
+      print(("Info: Invalid or uninitialized index (" .. tostring(current_idx) .. "). Setting to 1."))
+      return 1
     else
       local and_8_ = true
       if and_8_ then
         local _ = _3_
-        and_8_ = (index <= 0)
+        and_8_ = (current_idx == image_list_length)
       end
       if and_8_ then
         local _ = _3_
-        print("Error: index <= 0. Setting wallpaper to file 1")
+        print("Info: End of file list. Starting over.")
         return 1
       else
-        local and_10_ = true
-        if and_10_ then
-          local _ = _3_
-          and_10_ = (image_list_length < index)
-        end
-        if and_10_ then
-          local _ = _3_
-          print("Error: Index outside of total file list length. Setting wallpaper to file 1...")
-          return 1
-        else
-          local and_12_ = true
-          if and_12_ then
-            local _ = _3_
-            and_12_ = (image_list_length == index)
-          end
-          if and_12_ then
-            local _ = _3_
-            print("End of file list. Starting over.")
-            return 1
-          else
-            local _ = _3_
-            print("Changing wallpaper")
-            return (index + 1)
-          end
-        end
+        local _ = _3_
+        print(("Info: Advancing index from " .. current_idx .. " to " .. (current_idx + 1)))
+        return (current_idx + 1)
       end
     end
   end
 end
-local function change_wallpaper(file_paths, index, screen)
-  local url = ("file://" .. file_paths[index])
-  return hs.screen.mainScreen:desktopImageURL(url)
+local function change_wallpaper_on_screen(file_path, screen)
+  if (file_path and screen) then
+    do
+      local url = ("file://" .. file_path)
+      print(("Setting wallpaper to: " .. url))
+      screen:desktopImageURL(url)
+    end
+    hs.alert.show(("Wallpaper: " .. hs.fs.displayName(file_path)))
+    return 0.5
+  else
+    return nil
+  end
 end
+local function setup_wallpaper_rotator_new()
+  return print("Setting up wallpaper rotator...")
+end
+local function setup_wallpaper_rotator()
+  print("Setting up wallpaper rotator...")
+  local all_files_in_folder = hs.fs.fileListForPath(wallpaper_folder, {subdirs = true})
+  if not all_files_in_folder then
+    print(("Error: Could not read wallpaper folder: " .. wallpaper_folder))
+    return function() print('Wallpaper rotator not initialized: folder error.') end
+  else
+  end
+  print(("Found " .. #all_files_in_folder .. " total items in folder."))
+  local available_wallpapers = list_supported_files(supported_UTIs, all_files_in_folder)
+  print(("Found " .. #available_wallpapers .. " supported wallpaper files."))
+  local current_wallpaper_idx = 0
+  local function rotate_wallpaper_action()
+    print("--- Hotkey Pressed: Rotate Wallpaper ---")
+    if (#available_wallpapers == 0) then
+      print("No wallpapers available to rotate.")
+      return hs.alert.show("No wallpapers found!", 2)
+    else
+      local next_idx = calculate_next_index(available_wallpapers, current_wallpaper_idx)
+      if next_idx then
+        local current_wallpaper_idx0 = next_idx
+        return change_wallpaper_on_screen(available_wallpapers[current_wallpaper_idx0], hs.screen.mainScreen())
+      else
+        return hs.alert.show("Error calculating next wallpaper index.", 2)
+      end
+    end
+  end
+  return rotate_wallpaper_action
+end
+local rotate_wallpaper = setup_wallpaper_rotator()
 local function _15_()
-  return change_wallpaper({})
+  print("Hotkey E triggered for wallpaper rotation.")
+  if rotate_wallpaper then
+    return rotate_wallpaper()
+  else
+    return nil
+  end
 end
 hs.hotkey.bind({"cmd", "alt", "ctrl"}, "E", _15_)
-return print("wallpaper-changer file loaded")
+return print("Wallpaper rotator script loaded. Press Cmd+Alt+Ctrl+E to change wallpaper.")

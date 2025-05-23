@@ -1,20 +1,3 @@
-;(fn helloworld [] (hs.alert.show "Hello World!!"))
-;(local currentFile  (.. (os.getenv :HOME "/Picturrs/Wallpaper Rotation/master/0 - Z-AO - 80713652_p0")))
-;(each [file (hs.fs.dir imageFolder)] (print file))  
-
-(print "wallpaper script:")
-;(local supported-extensions [:bmp
-;                             :gif
-;                             :heic
-;                             :heif
-;                             :jpeg
-;                             :jpg
-;                             :pct
-;                             :pict
-;                             :png
-;                             :tif
-;                             :tiff
-;                             :webp))
 (local wallpaper-folder (.. (os.getenv :HOME) "/Pictures/Wallpaper Rotation/master"))
 
 (local supported-UTIs ["com.apple.pict"
@@ -26,23 +9,18 @@
                        "public.png"
                        "public.tiff"])
 
-;;(local min-until-switch 30) ;; time to have wallpaper on screen in minutes
+;; (local min-until-switch 30) ;; We'll ignore this for now
 
-;;(print "UTIs supported:")
-;;(each [_ UTI (ipairs supported-UTIs)]
-;;  (print UTI))
+(print "UTIs supported:")
+(each [_ UTI (ipairs supported-UTIs)]
+  (print UTI))
 
 (fn hassupportedUTI? [UTI-list path]
   "Checks if file path matches one of the UTIs"
   (each [_ UTI (ipairs UTI-list)]
     (when (= UTI (hs.fs.fileUTI path))
-      ;;(print (.. "File " path " has a supported UTI!"))
-      (lua "return true"))))
-
-;(local (candidate-paths candidate-num candidate-dir-num)
-;       (hs.fs.fileListForPath image-folder {:subdirs true})))))
-
-;(print (.. "Candidate count: " (tostring candidate-num)))
+      (lua "return true")))
+  false) ; Explicitly return false if no match
 
 (fn print-file-list [file-list]
   "Print file list (for debug purposes)"
@@ -57,36 +35,100 @@
         (table.insert file-list path)))
     file-list))
 
-;(local wallpaper-list (make-file-list supported-UTIs candidate-paths))
-
-
-(fn update-file-index [file-list index]
-  "Increments a file index by 1, or sets it the previous index is invalid.
-	Returns 0 if there is a problem with the file list"
-  (let [image-list-length (length file-list)]
-    (print (.. "Number of files available:" image-list-length))
-    (print (.. "Current index position:" index))
+(fn calculate-next-index [file-list current-idx]
+  "Calculates the next valid index for the file-list using 'case true'.
+   Handles wrap-around and initialization from 0 or invalid index.
+   Returns nil if file-list is empty or nil."
+  (let [image-list-length (length file-list)] ;; (length nil) or (length {}) will be 0
     (case true
-      (where _ (not file-list)) (do (print "Error: file-list is nil (or false). Somewhere something went wrong...")
-                                  0)
-      (where _ (= 0 image-list-length)) (do (print "Error: no images found")
-                                          0)
-      (where _ (<=  index 0)) (do (print "Error: index <= 0. Setting wallpaper to file 1") 
-                                1)
-      (where _ (< image-list-length index)) (do (print "Error: Index outside of total file list length. Setting wallpaper to file 1...") 
-                                              1)
-      (where _ (= image-list-length index)) (do (print "End of file list. Starting over.") 
-                                              1)
-      _ (do (print "Changing wallpaper") 
-          (+ index 1)))))
- 
+      ;; Condition 1: No files available
+      (where _ (or (not file-list) (= 0 image-list-length)))
+      (do
+        (print "Error: No images found in file-list or file-list is nil.")
+        nil) ; No files, no valid index
+
+      ;; Condition 2: Invalid or uninitialized current index
+      (where _ (or (not current-idx) (<= current-idx 0) (> current-idx image-list-length)))
+      (do
+        (print (.. "Info: Invalid or uninitialized index (" (tostring current-idx) "). Setting to 1."))
+        1) ; Set to first image
+
+      ;; Condition 3: Reached the end of the list
+      (where _ (= current-idx image-list-length))
+      (do
+        (print "Info: End of file list. Starting over.")
+        1) ; Wrap to first image
+
+      ;; Default Case: Valid index, not at end of list
+      _
+      (do
+        (print (.. "Info: Advancing index from " current-idx " to " (+ current-idx 1)))
+        (+ current-idx 1))))) ; Increment index
+
+(fn change-wallpaper-on-screen [file-path screen]
+  "Sets the desktop image for the given screen."
+  (when (and file-path screen)
+    (let [url (.. "file://" file-path)]
+      (print (.. "Setting wallpaper to: " url))
+      (screen:desktopImageURL url))
+    (hs.alert.show (.. "Wallpaper: " (hs.fs.displayName file-path))) 0.5)) ; Show a brief notification
+
+(fn setup-wallpaper-rotator-new []
+  (print "Setting up wallpaper rotator..."))
   
-(fn change-wallpaper [file-paths index screen]
-  (let [url (.. "file://" (. file-paths index))]
-    (hs.screen.mainScreen:desktopImageURL url))) 
 
 
-(hs.hotkey.bind [:cmd :alt :ctrl] :E (fn [] (change-wallpaper []))) ;;[]) 
+
+;; Removed the unused setup-wallpaper-rotator-new
+
+(fn setup-wallpaper-rotator []
+  (print "Setting up wallpaper rotator...")
+  (local all-files-in-folder (hs.fs.fileListForPath wallpaper-folder {:subdirs true}))
+  (when (not all-files-in-folder)
+    (print (.. "Error: Could not read wallpaper folder: " wallpaper-folder))
+    (lua "return function() print('Wallpaper rotator not initialized: folder error.') end"))
+
+  (print (.. "Found " (length all-files-in-folder) " total items in folder."))
+
+  (local available-wallpapers (list-supported-files supported-UTIs all-files-in-folder))
+  (print (.. "Found " (length available-wallpapers) " supported wallpaper files."))
+
+  (local current-wallpaper-idx 0) ; Initialized once, captured by the closure
+
+  (fn rotate-wallpaper-action []
+    (print "--- Hotkey Pressed: Rotate Wallpaper ---")
+    (if (= (length available-wallpapers) 0)
+      (do
+        (print "No wallpapers available to rotate.")
+        (hs.alert.show "No wallpapers found!" 2))
+      (let [next-idx (calculate-next-index available-wallpapers current-wallpaper-idx)]
+        (if next-idx
+            (do
+              ;; CRITICAL FIX: Use `set` to modify the closed-over `current-wallpaper-idx`
+              (var current-wallpaper-idx next-idx)
+              (change-wallpaper-on-screen (. available-wallpapers current-wallpaper-idx)
+                                          (hs.screen.mainScreen)))
+            (hs.alert.show "Error calculating next wallpaper index." 2))))))
+
+;; Create an instance of our rotator action
+(local rotate-wallpaper (setup-wallpaper-rotator))
+
+;; --- Hammerspoon Hotkey Binding ---
+(hs.hotkey.bind ["cmd" "alt" "ctrl"] :E
+  (fn []
+    (print "Hotkey E triggered for wallpaper rotation.")
+    (when rotate-wallpaper ; Good practice to check if it was initialized
+      (rotate-wallpaper))))
+
+
+;; Optional: To set the first wallpaper immediately on load/reload:
+;; (if rotate-wallpaper (rotate-wallpaper))
+
+(print "Wallpaper rotator script loaded. Press Cmd+Alt+Ctrl+E to change wallpaper.")
+
+;; For initial testing, you might want to call it once to set the first wallpaper:
+;; (if rotate-wallpaper (rotate-wallpaper))
+;(hs.hotkey.bind [:cmd :alt :ctrl] :E (fn [] (change-wallpaper []))) ;;[]) 
 ;(print (update-index wallpaper-list 1800))
      ; Indicate success
 
@@ -116,9 +158,7 @@
 ;     (.. "(?i)\\." (tostring ext-keyword) "$"))))
 ;(print "Generated regex patterns for filtering:" (hs.inspect extension-regex))
 ;
-;(print (.. "Current wallpaper directory: " imageFolder))
-
-(print "wallpaper-changer file loaded")
+;(print (.. "Current wallpaper directory: " imageFolder))(print "wallpaper-changer file loaded")
 
 
    
