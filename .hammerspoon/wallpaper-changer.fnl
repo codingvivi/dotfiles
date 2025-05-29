@@ -4,6 +4,10 @@
 (local wallpaper-folder
        (.. (os.getenv :HOME) "/Pictures/Wallpaper Rotation/master"))
 
+(local wallpaper-duration 5)
+
+;in mins
+
 (local supported-UTIs-old ["com.apple.pict"
                            "com.compuserve.gif"
                            "com.microsoft.bmp"
@@ -12,9 +16,6 @@
                            "public.jpeg"
                            "public.png"
                            "public.tiff"])
-
-;; (local min-until-switch 30) ;; We'll ignore this for now
-;(hs.settings.set wallpaper-identifier 0)  
 
 (print "UTIs supported:")
 (each [_ UTI (ipairs supported-UTIs-old)]
@@ -101,8 +102,6 @@
     (hs.alert.show (.. "Wallpaper: " (hs.fs.displayName file-path)))
     0.5))
 
-; Show a brief notification
-
 (fn run-rotator [folder]
   (let [supported-UTIs ["com.apple.pict"
                         "com.compuserve.gif"
@@ -114,18 +113,47 @@
                         "public.tiff"]
         (cadidate-paths cadidate-num cadidate-dir-num) (get-files folder)
         image-paths (get-supported-file-paths supported-UTIs cadidate-paths)]
-    (table.sort image-paths natcmp.utf8.lt)
-    ; if image list is not nil or 0
-    (when (and image-paths (> (length image-paths) 0)) 
-      (table.sort image-paths natcmp.utf8.lt) ; sort list with image-paths
-      ; calculate next index
+    (table.sort image-paths natcmp.utf8.lt) ; if image list is not nil or 0
+    (when (and image-paths (> (length image-paths) 0))
+      (table.sort image-paths natcmp.utf8.lt) ; sort list with image-paths ; calculate next index
       (let [next-index (calculate-next-index image-paths
                                              (hs.settings.get "wallpaper-index"))]
         ;if index is not nil
         (when next-index
           (hs.settings.set "wallpaper-index" next-index) ; set system variable for index
           (change-wallpaper-on-screen (. image-paths next-index)
-                                      (hs.screen.mainScreen))))))) ;change the wallpaper
+                                      (hs.screen.mainScreen)))))))
+
+;change the wallpaper
+
+;; --- timing stuff ---
+(fn check-value-change [value-new value-old]
+  (let [change (- value-new value-old)]
+    (if (= 0 change)
+        (print "Value remains the same")
+        (print (.. "Value has changed by" change)))
+    change))
+
+(fn init-wallpaper-timer [duration folder]
+  (print "checking timer change (in seconds)")
+  (let [duration-secs-new (hs.timer.minutes duration)]
+    (var duration-secs-old (hs.settings.get "wallpaper-timer-dur"))
+    (when (= nil duration-secs-old)
+      (print "Old wallpaper timer duration is nil (due to this being the first run, or a bug. Setting it to 0")
+      (set duration-secs-old 0))
+    (let [change (check-value-change duration-secs-new
+                                     duration-secs-old)]
+      (when change
+        (print (.. "Adjusting timer by" change "minutes"))
+        (hs.settings.set "wallpaper-timer-dur" duration-secs-new))
+      (local wallpaper-timer
+             (hs.timer.new (hs.settings.get "wallpaper-timer-dur")
+                           (fn [] (run-rotator folder))))
+      (wallpaper-timer:start))))
+
+(init-wallpaper-timer wallpaper-duration wallpaper-folder)
+
+;;(fn wallpaper-timer [duration folder])
 
 ;; --- Hammerspoon Hotkey Binding ---
 (hs.hotkey.bind ["cmd" "ctrl"] :E

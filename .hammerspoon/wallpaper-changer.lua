@@ -1,6 +1,7 @@
--- :fennel:1748530399
+-- :fennel:1748546349
 local natcmp = require("string.natcmp")
 local wallpaper_folder = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
+local wallpaper_duration = 5
 local supported_UTIs_old = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
 print("UTIs supported:")
 for _, UTI in ipairs(supported_UTIs_old) do
@@ -115,7 +116,39 @@ local function run_rotator(folder)
     return nil
   end
 end
-local function _15_()
+local function check_value_change(value_new, value_old)
+  local change = (value_new - value_old)
+  if (0 == change) then
+    print("Value remains the same")
+  else
+    print(("Value has changed by" .. change))
+  end
+  return change
+end
+local function init_wallpaper_timer(duration, folder)
+  print("checking timer change (in seconds)")
+  local duration_secs_new = hs.timer.minutes(duration)
+  local duration_secs_old = hs.settings.get("wallpaper-timer-dur")
+  if (nil == duration_secs_old) then
+    print("Old wallpaper timer duration is nil (due to this being the first run, or a bug. Setting it to 0")
+    duration_secs_old = 0
+  else
+  end
+  local change = check_value_change(duration_secs_new, duration_secs_old)
+  if change then
+    print(("Adjusting timer by" .. change .. "minutes"))
+    hs.settings.set("wallpaper-timer-dur", duration_secs_new)
+  else
+  end
+  local wallpaper_timer
+  local function _18_()
+    return run_rotator(folder)
+  end
+  wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _18_)
+  return wallpaper_timer:start()
+end
+init_wallpaper_timer(wallpaper_duration, wallpaper_folder)
+local function _19_()
   return print("Hotkey E triggered for wallpaper rotation.", run_rotator(wallpaper_folder))
 end
-return hs.hotkey.bind({"cmd", "ctrl"}, "E", _15_)
+return hs.hotkey.bind({"cmd", "ctrl"}, "E", _19_)
