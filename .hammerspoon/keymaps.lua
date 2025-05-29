@@ -1,4 +1,4 @@
--- :fennel:1747938770
+-- :fennel:1748014169
 local target_bundle_id = "com.apple.Terminal"
 local app_specific_hotkeys = {}
 local app_watcher = nil
