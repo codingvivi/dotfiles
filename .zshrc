@@ -107,6 +107,10 @@ alias lt='eza -al --sort=modified'
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
+# Deceive Yazi into thinking you're running in kitty,
+# forcing it fallback to Überzug++ or Chafa
+#TERM=xterm-kitty #yazi
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -115,3 +119,6 @@ export NVM_DIR="$HOME/.nvm"
 export PATH=$PATH:~/.local/share/bob/nvim-bin
 export PATH="/Applications/MacPorts/Emacs.app/Contents/MacOS:$PATH"
 export PATH="$HOME/.emacs.d/bin:$PATH"
+#export PATH="$(brew --prefix qt)/bin:$PATH"
+
+    
