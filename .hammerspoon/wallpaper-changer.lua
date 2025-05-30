@@ -1,7 +1,7 @@
--- :fennel:1748546349
+-- :fennel:1748638746
 local natcmp = require("string.natcmp")
 local wallpaper_folder = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
-local wallpaper_duration = 5
+local wallpaper_duration = 30
 local supported_UTIs_old = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
 print("UTIs supported:")
 for _, UTI in ipairs(supported_UTIs_old) do
@@ -92,7 +92,7 @@ local function change_wallpaper_on_screen(file_path, screen)
       print(("Setting wallpaper to: " .. url))
       screen:desktopImageURL(url)
     end
-    hs.alert.show(("Wallpaper: " .. hs.fs.displayName(file_path)))
+    print(("Wallpaper: " .. hs.fs.displayName(file_path)))
     return 0.5
   else
     return nil
@@ -121,34 +121,68 @@ local function check_value_change(value_new, value_old)
   if (0 == change) then
     print("Value remains the same")
   else
-    print(("Value has changed by" .. change))
+    print(("Value has changed by " .. change))
   end
   return change
 end
-local function init_wallpaper_timer(duration, folder)
-  print("checking timer change (in seconds)")
+local function init_wallpaper_duration(duration)
   local duration_secs_new = hs.timer.minutes(duration)
+  print(("Converted duration of " .. duration .. " minutes into " .. duration_secs_new .. " seconds"))
   local duration_secs_old = hs.settings.get("wallpaper-timer-dur")
   if (nil == duration_secs_old) then
     print("Old wallpaper timer duration is nil (due to this being the first run, or a bug. Setting it to 0")
     duration_secs_old = 0
   else
   end
+  print("checking timer change (in seconds)")
   local change = check_value_change(duration_secs_new, duration_secs_old)
-  if change then
-    print(("Adjusting timer by" .. change .. "minutes"))
-    hs.settings.set("wallpaper-timer-dur", duration_secs_new)
+  local _17_ = print(("Adjusting timer by " .. change .. " seconds"))
+  if ((0 ~= change) or (change ~= _17_) or (_17_ ~= print("No change in duration of timer since last initialization"))) then
+    return hs.settings.set("wallpaper-timer-dur", duration_secs_new)
+  else
+    return nil
+  end
+end
+print("Initalizing duration and timer")
+init_wallpaper_duration(wallpaper_duration)
+local wallpaper_timer
+local function _19_()
+  return run_rotator(wallpaper_folder)
+end
+wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _19_)
+local function pause_wallpaper_timer()
+  print("Screens went to sleep.")
+  print("Saving remaining wallpaper time")
+  hs.settings.set("remaining-wallpaper-time", wallpaper_timer:nextTrigger())
+  print((hs.settings.get("remaining-wallpaper-time") .. " seconds remaining"))
+  return print("Stopping wallpaper-timer")
+end
+local function resume_wallpaper_timer()
+  print("Screens woke up. Resuming wallpaper-timer")
+  print((hs.settings.get("remaining-wallpaper-time") .. " seconds remaining"))
+  return wallpaper_timer:setNextTrigger(hs.settings.get("remaining-wallpaper-time"))
+end
+print("starting wallpaper-timer")
+wallpaper_timer:start()
+hs.settings.set("remaining-wallpaper-time", 0)
+print("Initalizing screen-state watcher")
+local screen_state_watcher
+local function _20_(event_type)
+  if (event_type == hs.caffeinate.watcher.screensDidSleep) then
+    pause_wallpaper_timer()
+    wallpaper_timer:stop()
   else
   end
-  local wallpaper_timer
-  local function _18_()
-    return run_rotator(folder)
+  if (event_type == hs.caffeinate.watcher.screensDidWake) then
+    return resume_wallpaper_timer()
+  else
+    return nil
   end
-  wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _18_)
-  return wallpaper_timer:start()
 end
-init_wallpaper_timer(wallpaper_duration, wallpaper_folder)
-local function _19_()
+screen_state_watcher = hs.caffeinate.watcher.new(_20_)
+print("starting wallpaper-timer")
+screen_state_watcher:start()
+local function _23_()
   return print("Hotkey E triggered for wallpaper rotation.", run_rotator(wallpaper_folder))
 end
-return hs.hotkey.bind({"cmd", "ctrl"}, "E", _19_)
+return hs.hotkey.bind({"cmd", "ctrl"}, "E", _23_)

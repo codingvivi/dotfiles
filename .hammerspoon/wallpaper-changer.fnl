@@ -4,7 +4,7 @@
 (local wallpaper-folder
        (.. (os.getenv :HOME) "/Pictures/Wallpaper Rotation/master"))
 
-(local wallpaper-duration 5)
+(local wallpaper-duration 30)
 
 ;in mins
 
@@ -99,7 +99,7 @@
     (let [url (.. "file://" file-path)]
       (print (.. "Setting wallpaper to: " url))
       (screen:desktopImageURL url))
-    (hs.alert.show (.. "Wallpaper: " (hs.fs.displayName file-path)))
+    (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
     0.5))
 
 (fn run-rotator [folder]
@@ -131,35 +131,96 @@
   (let [change (- value-new value-old)]
     (if (= 0 change)
         (print "Value remains the same")
-        (print (.. "Value has changed by" change)))
+        (print (.. "Value has changed by " change)))
     change))
 
-(fn init-wallpaper-timer [duration folder]
-  (print "checking timer change (in seconds)")
+;; initalize time duration
+(fn init-wallpaper-duration [duration]
+  "Initializes timer and timer duration. 
+	Checks if there has been a duration chance since the last initalization"
   (let [duration-secs-new (hs.timer.minutes duration)]
+    ;; convert duration into seconds
+    (print (.. "Converted duration of " duration " minutes into "
+               duration-secs-new " seconds"))
+    ;; get old duration
     (var duration-secs-old (hs.settings.get "wallpaper-timer-dur"))
+    ;; if old duration is nil...
     (when (= nil duration-secs-old)
       (print "Old wallpaper timer duration is nil (due to this being the first run, or a bug. Setting it to 0")
       (set duration-secs-old 0))
-    (let [change (check-value-change duration-secs-new
-                                     duration-secs-old)]
-      (when change
-        (print (.. "Adjusting timer by" change "minutes"))
-        (hs.settings.set "wallpaper-timer-dur" duration-secs-new))
-      (local wallpaper-timer
-             (hs.timer.new (hs.settings.get "wallpaper-timer-dur")
-                           (fn [] (run-rotator folder))))
-      (wallpaper-timer:start))))
+    ;; calculate duration change
+    (print "checking timer change (in seconds)")
+    (let [change (check-value-change duration-secs-new duration-secs-old)]
+      (if (not= 0 change (print (.. "Adjusting timer by " change " seconds"))
+                (print "No change in duration of timer since last initialization"))
+          ;; set new duration in persistent variable
+          (hs.settings.set "wallpaper-timer-dur" duration-secs-new)))))
 
-(init-wallpaper-timer wallpaper-duration wallpaper-folder)
+(print "Initalizing duration and timer")
+;; run duration initalizer
+(init-wallpaper-duration wallpaper-duration)
 
-;;(fn wallpaper-timer [duration folder])
+;; create timer object that will change wallpaper after certain amount of time
+(local wallpaper-timer
+       (hs.timer.new (hs.settings.get "wallpaper-timer-dur")
+                     (fn [] (run-rotator wallpaper-folder))))
+
+(fn pause-wallpaper-timer []
+  "gets current wallpaper-timer time, 
+	writes it to persistent var,
+	pauses"
+  (print "Screens went to sleep.")
+  (print "Saving remaining wallpaper time")
+  (hs.settings.set "remaining-wallpaper-time"
+                   (wallpaper-timer:nextTrigger))
+  (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
+  (print "Stopping wallpaper-timer"))
+
+
+(fn resume-wallpaper-timer []
+  "gets saved wallpaper-timer time, 
+	continues timer"
+  (print "Screens woke up. Resuming wallpaper-timer")
+  (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
+  (wallpaper-timer:setNextTrigger (hs.settings.get "remaining-wallpaper-time")))
+
+  
+;; start timer-object
+(print "starting wallpaper-timer")
+(wallpaper-timer:start)
+(hs.settings.set "remaining-wallpaper-time" 0)
+(print "Initalizing screen-state watcher")
+(local screen-state-watcher
+       (hs.caffeinate.watcher.new (fn [event-type]
+                                    (when (= event-type hs.caffeinate.watcher.screensDidSleep)
+                                          (pause-wallpaper-timer)                                               (wallpaper-timer:stop))
+                                    (when (= event-type hs.caffeinate.watcher.screensDidWake)
+                                          (resume-wallpaper-timer)))))
+                                            
+
+(print "starting wallpaper-timer")
+(screen-state-watcher:start)
 
 ;; --- Hammerspoon Hotkey Binding ---
 (hs.hotkey.bind ["cmd" "ctrl"] :E
                 (fn []
                   (print "Hotkey E triggered for wallpaper rotation."
                          (run-rotator wallpaper-folder))))
+
+
+
+;(fn fullscreen? [])
+;(fn sleep? [])
+;(fn screensaver? [])
+
+;(fn desktop-invisible? []
+;  if (or hs.caffeinate.watcher.screensDidSleep)
+         
+       
+ ; true
+;  false)
+
+
 
 ;; Removed the unused setup-wallpaper-rotator-new
 
