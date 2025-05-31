@@ -40,7 +40,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/Library/Mobile Documents/ Documents/iCloud~com~appsonthemove~beorg/Documents/org")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -182,10 +182,10 @@
 
 
 (after! org
-  (setq org-agenda-files '("~/org/")))
+  (setq org-agenda-files '("/Users/musicvivireal/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")))
 
 
-(setq org-roam-directory "~/org/")
+(setq org-roam-directory "/Users/musicvivireal/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")
 (setq org-roam-capture-templates
       '(("d" "default" plain
          "%?"
@@ -194,7 +194,7 @@
          :unnarrowed t)))
 
 
-(setq org-journal-dir "~/org/"
+(setq org-journal-dir "/Users/musicvivireal/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org"
       org-journal-file-format "%Y%m%d-dailyfile.org"
       org-journal-carryover-items "asdfsdf")
 
