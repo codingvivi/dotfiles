@@ -1,0 +1,12 @@
+[flavor]
+#dark  = "powerlevel10k"
+
+#dark = "monokai-vibrant"
+#light = "monokai-vibrant"
+
+dark = "timu-macos-dark"
+light = "timu-macos-light"
+
+[status]
+sep_left = { open = " ", close = " " }
+sep_right = { open = " ", close = " " }

@@ -79,6 +79,10 @@ z4h bindkey z4h-cd-forward Shift+Right  # cd into the next directory
 z4h bindkey z4h-cd-up      Shift+Up     # cd into the parent directory
 z4h bindkey z4h-cd-down    Shift+Down   # cd into a child directory
 
+# Default text editor
+export EDITOR='nvim'
+export VISUAL='nvim'
+
 # Autoload functions.
 autoload -Uz zmv
 
@@ -92,6 +96,7 @@ compdef _directories md
 # Define aliases.
 alias tree='tree -a -I .git'
 
+## exa ls replacement
 alias ld='eza -lD'
 alias lf='eza -lF --color=always | grep -v /'
 alias lh='eza -dl .* --group-directories-first'
@@ -107,9 +112,18 @@ alias lt='eza -al --sort=modified'
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
+# yazi
 # Deceive Yazi into thinking you're running in kitty,
 # forcing it fallback to Überzug++ or Chafa
 #TERM=xterm-kitty #yazi
+# have yazi drop you off in folder you quit into
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
