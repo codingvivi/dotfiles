@@ -1,4 +1,4 @@
--- :fennel:1748638746
+-- :fennel:1748692498
 local natcmp = require("string.natcmp")
 local wallpaper_folder = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
 local wallpaper_duration = 30
@@ -150,6 +150,8 @@ local function _19_()
   return run_rotator(wallpaper_folder)
 end
 wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _19_)
+print("starting wallpaper-timer")
+wallpaper_timer:start()
 local function pause_wallpaper_timer()
   print("Screens went to sleep.")
   print("Saving remaining wallpaper time")
@@ -162,8 +164,6 @@ local function resume_wallpaper_timer()
   print((hs.settings.get("remaining-wallpaper-time") .. " seconds remaining"))
   return wallpaper_timer:setNextTrigger(hs.settings.get("remaining-wallpaper-time"))
 end
-print("starting wallpaper-timer")
-wallpaper_timer:start()
 hs.settings.set("remaining-wallpaper-time", 0)
 print("Initalizing screen-state watcher")
 local screen_state_watcher

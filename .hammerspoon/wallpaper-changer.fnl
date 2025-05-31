@@ -90,8 +90,7 @@
                        (+ current-idx 1)))
             (+ current-idx 1))))))
 
-; Increment index
-
+; change the wallpaper function
 (fn change-wallpaper-on-screen [file-path screen]
   "Sets the desktop image for the given screen."
   (print "test")
@@ -102,6 +101,7 @@
     (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
     0.5))
 
+; run full wallpaper change routine
 (fn run-rotator [folder]
   (let [supported-UTIs ["com.apple.pict"
                         "com.compuserve.gif"
@@ -124,9 +124,7 @@
           (change-wallpaper-on-screen (. image-paths next-index)
                                       (hs.screen.mainScreen)))))))
 
-;change the wallpaper
-
-;; --- timing stuff ---
+;; --- basic timer stuff ---
 (fn check-value-change [value-new value-old]
   (let [change (- value-new value-old)]
     (if (= 0 change)
@@ -157,7 +155,6 @@
           (hs.settings.set "wallpaper-timer-dur" duration-secs-new)))))
 
 (print "Initalizing duration and timer")
-;; run duration initalizer
 (init-wallpaper-duration wallpaper-duration)
 
 ;; create timer object that will change wallpaper after certain amount of time
@@ -165,17 +162,19 @@
        (hs.timer.new (hs.settings.get "wallpaper-timer-dur")
                      (fn [] (run-rotator wallpaper-folder))))
 
+(print "starting wallpaper-timer")
+(wallpaper-timer:start)
+
+; --- timer-pausing stuff ---
 (fn pause-wallpaper-timer []
   "gets current wallpaper-timer time, 
 	writes it to persistent var,
 	pauses"
   (print "Screens went to sleep.")
   (print "Saving remaining wallpaper time")
-  (hs.settings.set "remaining-wallpaper-time"
-                   (wallpaper-timer:nextTrigger))
+  (hs.settings.set "remaining-wallpaper-time" (wallpaper-timer:nextTrigger))
   (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
   (print "Stopping wallpaper-timer"))
-
 
 (fn resume-wallpaper-timer []
   "gets saved wallpaper-timer time, 
@@ -184,19 +183,20 @@
   (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
   (wallpaper-timer:setNextTrigger (hs.settings.get "remaining-wallpaper-time")))
 
-  
-;; start timer-object
-(print "starting wallpaper-timer")
-(wallpaper-timer:start)
+; pause on screen off var
 (hs.settings.set "remaining-wallpaper-time" 0)
 (print "Initalizing screen-state watcher")
 (local screen-state-watcher
        (hs.caffeinate.watcher.new (fn [event-type]
-                                    (when (= event-type hs.caffeinate.watcher.screensDidSleep)
-                                          (pause-wallpaper-timer)                                               (wallpaper-timer:stop))
-                                    (when (= event-type hs.caffeinate.watcher.screensDidWake)
-                                          (resume-wallpaper-timer)))))
-                                            
+                                    (when (= event-type
+                                                 ;(or hs.caffeinate.watcher.screensaverDidStart)
+                                                 hs.caffeinate.watcher.screensDidSleep)
+                                      (pause-wallpaper-timer)
+                                      (wallpaper-timer:stop))
+                                    (when (= event-type
+                                             ;(or hs.caffeinate.watcher.screensaverDidStop
+                                                 hs.caffeinate.watcher.screensDidWake)
+                                      (resume-wallpaper-timer)))))
 
 (print "starting wallpaper-timer")
 (screen-state-watcher:start)
@@ -206,91 +206,3 @@
                 (fn []
                   (print "Hotkey E triggered for wallpaper rotation."
                          (run-rotator wallpaper-folder))))
-
-
-
-;(fn fullscreen? [])
-;(fn sleep? [])
-;(fn screensaver? [])
-
-;(fn desktop-invisible? []
-;  if (or hs.caffeinate.watcher.screensDidSleep)
-         
-       
- ; true
-;  false)
-
-
-
-;; Removed the unused setup-wallpaper-rotator-new
-
-;(fn setup-wallpaper-rotator []
-;  (print "Setting up wallpaper rotator...")
-;  (local all-files-in-folder (hs.fs.fileListForPath wallpaper-folder {:subdirs true}))
-;  (when (not all-files-in-folder)
-;    (print (.. "Error: Could not read wallpaper folder: " wallpaper-folder))
-;    (lua "return function() print('Wallpaper rotator not initialized: folder error.') end"))
-;
-;  (print (.. "Found " (length all-files-in-folder) " total items in folder."))
-;
-;  (local available-wallpapers (list-supported-files supported-UTIs all-files-in-folder))
-;  (print (.. "Found " (length available-wallpapers) " supported wallpaper files."))
-;
-;  (local current-wallpaper-idx 0) ; Initialized once, captured by the closure
-;
-;  (fn rotate-wallpaper-action []
-;    (print "--- Hotkey Pressed: Rotate Wallpaper ---")
-;    (if (= (length available-wallpapers) 0)
-;      (do
-;        (print "No wallpapers available to rotate.")
-;        (hs.alert.show "No wallpapers found!" 2))
-;      (let [next-idx (calculate-next-index available-wallpapers current-wallpaper-idx)]
-;        (if next-idx
-;            (do
-;              ;; CRITICAL FIX: Use `set` to modify the closed-over `current-wallpaper-idx`
-;              (var current-wallpaper-idx next-idx)
-;              (change-wallpaper-on-screen (. available-wallpapers current-wallpaper-idx)
-;                                          (hs.screen.mainScreen)))
-;            (hs.alert.show "Error calculating next wallpaper index." 2))))))
-;
-;;; Create an instance of our rotator action
-;(local rotate-wallpaper (setup-wallpaper-rotator))
-;
-;
-;;; Optional: To set the first wallpaper immediately on load/reload:
-;;; (if rotate-wallpaper (rotate-wallpaper))
-;
-;(print "Wallpaper rotator script loaded. Press Cmd+Alt+Ctrl+E to change wallpaper.")
-
-;; For initial testing, you might want to call it once to set the first wallpaper:
-;; (if rotate-wallpaper (rotate-wallpaper))
-;(hs.hotkey.bind [:cmd :alt :ctrl] :E (fn [] (change-wallpaper []))) ;;[]) 
-;(print (update-index wallpaper-list 1800))
-; Indicate success
-
-;(if (not (and image-list (= (length image-list) 0)))
-;  (print "Error: No suitable files for wallpapers found, or list is empty.")
-;  (if (not (and (>= index 1) (<= index (length image-list)))))
-;   (print (.. "Error: Index " index " is out of bounds for wallpaper list of length " (length image-list) ".")))
-
-;(rotate-wallpaper wallpaper-list 1)
-;(hs.timer.doEvery 10 print-bang)
-
-;;(print-filelist)
-;(fn print-UTI [list-of-files]
-;  "Print UTI list (for debug purposes)"
-;  (each [_ file (ipairs list-of-files)] ; Using _ for index again
-;    (print (hs.fs.fileUTI file))))
-;(print-UTI candidate-list)
-
-;(print "extensions supported:")
-;(each [_ ext (ipairs supported-extensions)]
-;  (print ext))
-
-;(local extension-regex 
-;   (icollect [_ ext-keyword (ipairs supported-extensions)] ; _ means we don't care about the index
-;     ;; concat the endings into regex expressions
-;     (.. "(?i)\\." (tostring ext-keyword) "$"))))
-;(print "Generated regex patterns for filtering:" (hs.inspect extension-regex))
-;
-;(print (.. "Current wallpaper directory: " imageFolder))(print "wallpaper-changer file loaded")
