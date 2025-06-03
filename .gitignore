@@ -9,35 +9,51 @@
 
 !.config/
 
+#kitty
 !.config/kitty/
 !.config/kitty/kitty.conf
 
+#ghostty
 !.config/ghostty/
 !.config/ghostty/**
 
+#yazi
 !.config/yazi/
 !.config/yazi/*
 
+#nvim
 !.config/nvim/
 !.config/nvim/**
 !.config/neovide/
 !.config/neovide/config.config.toml
 
+#helix
+!.config/helix/
+!.config/helix/**
+.config/helix/runtime
+.config/helix/runtime/**
+
+#yt-dlp
 !.config/yt-dlp/
 !.config/yt-dlp/config
 
+#karabiner
 !.config/karabiner/
 !.config/karabiner/**
 
+#zellij
 !.config/zellij
 !.config/zellij/**
 
+#emacs
 !.doom.d/
 !.doom.d/**
 
+#hammerspoon
 !.hammerspoon/
 !.hammerspoon/**
 
+#tmux
 #former not used anymore
 !.tmux.conf
 !.config/tmux/

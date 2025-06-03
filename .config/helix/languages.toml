@@ -1,0 +1,19 @@
+[language-server.fennel-ls]
+command = "fennel-ls"
+
+[[language]]
+name = "fennel"
+scope = "source.fnl"
+injection-regex = "(fennel|fnl)"
+file-types = ["fnl"]
+shebangs = ["fennel"]
+roots = []
+comment-token = ";"
+indent = { tab-width = 2, unit = "  " }
+formatter = { command = "fnlfmt", args = ["-"] }
+language-servers = [ "fennel-ls" ]
+grammar = "fennel"
+
+[[grammar]]
+name = "fennel"
+source = { git = "https://github.com/travonted/tree-sitter-fennel", rev = "15e4f8c417281768db17080c4447297f8ff5343a"}
