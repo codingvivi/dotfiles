@@ -1,2 +1,2 @@
--- :fennel:1748021619
+-- :fennel:1748918651
 return require("wallpaper-changer")

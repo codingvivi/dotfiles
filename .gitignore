@@ -38,8 +38,10 @@
 !.hammerspoon/
 !.hammerspoon/**
 
-
+#former not used anymore
 !.tmux.conf
+!.config/tmux/
+!.config/tmux/**
 
 !.zshrc
 # ============================================

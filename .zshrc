@@ -97,12 +97,12 @@ compdef _directories md
 alias tree='tree -a -I .git'
 
 ## exa ls replacement
-alias ld='eza -lD'
-alias lf='eza -lF --color=always | grep -v /'
-alias lh='eza -dl .* --group-directories-first'
-alias ll='eza -al --group-directories-first'
-alias ls='eza -alF --color=always --sort=size | grep -v /'
-alias lt='eza -al --sort=modified'
+alias ld='lsd -lD'
+alias lf='lsd -lF --color=always | grep -v /'
+alias lh='lsd -dl .* --group-directories-first'
+alias ll='lsd -al --group-directories-first'
+alias ls='lsd -alF --color=always --sort=size | grep -v /'
+alias lt='lsd -al --sort=modified'
 
 
 # Add flags to existing aliases.
