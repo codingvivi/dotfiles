@@ -1,1 +1,8 @@
   theme = "oxocarbon-translucent"
+
+[editor.cursor-shape]
+
+
+# At most one section each of 'keys.normal', 'keys.insert' and 'keys.select'
+#[[keys.normal]]
+insert = "bar"

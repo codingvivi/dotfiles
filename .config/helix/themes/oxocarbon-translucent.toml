@@ -1,2 +1,3 @@
 inherits = "oxocarbon"
 "ui.background" ={}
+"ui.linenr" = { fg = "#525252", bg = "" }
