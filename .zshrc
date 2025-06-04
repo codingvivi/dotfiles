@@ -83,6 +83,9 @@ z4h bindkey z4h-cd-down    Shift+Down   # cd into a child directory
 export EDITOR='nvim'
 export VISUAL='nvim'
 
+# helix setting
+export HELIX_RUNTIME="~/.config/helix/runtime"
+
 # Autoload functions.
 autoload -Uz zmv
 
