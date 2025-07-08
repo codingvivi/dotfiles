@@ -69,6 +69,7 @@ z4h source ~/.env.zsh
 # This is just an example that you should delete. It does nothing useful.
 #z4h source ohmyzsh/ohmyzsh/lib/diagnostics.zsh  # source an individual file
 #z4h load   ohmyzsh/ohmyzsh/plugins/emoji-clock  # load a plugin
+z4h load   ohmyzsh/ohmyzsh/plugins/zsh-vi-mode  # load a plugin
 
 # Define key bindings.
 z4h bindkey undo Ctrl+/   Shift+Tab  # undo the last command line change
