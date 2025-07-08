@@ -1,8 +1,58 @@
-  theme = "oxocarbon-translucent"
+theme = "vivicarbon-translucent"
+
+[editor]
+line-number = "relative"
+cursorline = true # Highlight all lines with a cursor
+color-modes = true # Whether to color the mode indicator with different colors depending on the mode itself
 
 [editor.cursor-shape]
+insert = "bar"
+
+[editor.statusline]
+left = ["mode", "version-control", "spinner"]
+center = ["file-name"]
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "│"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
 
 
 # At most one section each of 'keys.normal', 'keys.insert' and 'keys.select'
-#[[keys.normal]]
-insert = "bar"
+
+# [b]uffer
+[keys.normal.space."b"]
+n = ":buffer-next"
+p = ":buffer-previous"
+
+# [c]ode
+[keys.normal.space."c"]
+f = ":new"
+x = ":format"
+
+# [f]ile
+[keys.normal.space."f"]
+f = "file_picker"
+p = ":config-open"
+s = ":w"
+S = ":w!"
+q = ":q"
+Q = ":q!"
+
+#[h]elp (and other meta stuff)
+[keys.normal.space."h"]
+l = ":log-open"
+r = ":config-reload"
+x = "command_palette"
+
+# [keys.normal.space.f.f]
+# s = ":w!"
+# q = ":q!"
+
+#[q]uit 
+[keys.normal.space."q"]
+s = ":wqa"
+S = ":wqa!"
+q = ":qa"
+Q = ":qa!"
+
