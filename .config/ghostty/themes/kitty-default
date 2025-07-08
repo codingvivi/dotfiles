@@ -1,0 +1,19 @@
+
+palette = 0=#000000
+palette = 1=#bb281b
+palette = 2=#5fc83b
+palette = 3=#cdcb42
+palette = 4=#3471c6
+palette = 5=#ba32ca
+palette = 6=#5ecacb
+palette = 7=#dddddd
+palette = 8=#767676
+palette = 9=#de3b2f
+palette = 10=#78f94c
+palette = 11=#fffd54
+palette = 12=#448df7
+palette = 13=#e941f7
+palette = 14=#77fbfd
+palette = 15=#ffffff
+background = #000000
+foreground = #ffffff

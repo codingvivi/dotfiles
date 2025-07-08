@@ -1,4 +1,10 @@
-background-opacity = 0.75 
+window-colorspace = display-p3
+background-opacity = 0.75
+theme = kitty-default
 font-family = SF Mono
-theme = 3024 Night
+font-style = Semibold
+font-style-bold = Heavy
+font-style-italic = Semibold Italic
+font-style-bold-italic = Heavy Italic
 macos-titlebar-style = hidden
+cursor-style = block
