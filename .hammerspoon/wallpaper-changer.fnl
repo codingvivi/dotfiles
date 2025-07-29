@@ -1,26 +1,34 @@
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+;                                   require                                    ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;; utf8 sorter
 (local natcmp (require :string.natcmp))
 
-(local wallpaper-folder
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+;                                    locals                                    ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+(local WALLPAPER-FOLDER
        (.. (os.getenv :HOME) "/Pictures/Wallpaper Rotation/master"))
 
-(local wallpaper-duration 30)
+;;in mins
+(local WALLPAPER-DUR-MINS 30)
 
-;in mins
-
-(local supported-UTIs-old ["com.apple.pict"
-                           "com.compuserve.gif"
-                           "com.microsoft.bmp"
-                           "public.heic"
-                           "public.heif"
-                           "public.jpeg"
-                           "public.png"
-                           "public.tiff"])
+(local SUPPORTED-UTIS ["com.apple.pict"
+                       "com.compuserve.gif"
+                       "com.microsoft.bmp"
+                       "public.heic"
+                       "public.heif"
+                       "public.jpeg"
+                       "public.png"
+                       "public.tiff"])
 
 (print "UTIs supported:")
-(each [_ UTI (ipairs supported-UTIs-old)]
+(each [_ UTI (ipairs SUPPORTED-UTIS)]
   (print UTI))
-
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+;                                   helpers                                    ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ files ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 (fn get-files [folder-path]
   "Returns number list with files, number of files and subdirs"
   (let [(files filenum dirnum) (hs.fs.fileListForPath folder-path
@@ -37,7 +45,7 @@
     (print file)))
 
 ;; debugging
-;(let [(file-list b c) (get-files wallpaper-folder)]
+;(let [(file-list b c) (get-files WALLPAPER-FOLDER)]
 ;  (print-file-list file-list))
 
 (fn hassupportedUTI? [UTI-list path]
@@ -90,6 +98,26 @@
                        (+ current-idx 1)))
             (+ current-idx 1))))))
 
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ screen stuff ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+(fn get-available-screens []
+  (print "Refreshing screens available...")
+  (let [screen-list (hs.screen.allScreens)
+        screen-amount (length screen-list)]
+    (print (.. "Number of screens detected: " screen-amount))
+    screen-list))
+
+(local available-screens get-available-screens)
+
+(fn print_screens [screen-list]
+  (each [i screen (ipairs (screen-list))]
+    ;; you can just prepend a method to the screen
+    ;; since its a hs.screen object
+    (print (.. "Screen " i ": " (screen:name) " - "
+               (let [frame (screen:frame)]
+                 (.. frame.w "x" frame.h " px"))))))
+
+(print_screens available-screens)
+
 ; change the wallpaper function
 (fn change-wallpaper-on-screen [file-path screen]
   "Sets the desktop image for the given screen."
@@ -100,6 +128,7 @@
       (screen:desktopImageURL url))
     (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
     0.5))
+
 
 ; run full wallpaper change routine
 (fn run-rotator [folder]
@@ -133,7 +162,7 @@
     change))
 
 ;; initalize time duration
-(fn init-wallpaper-duration [duration]
+(fn init-WALLPAPER-DUR-MINS [duration]
   "Initializes timer and timer duration. 
 	Checks if there has been a duration chance since the last initalization"
   (let [duration-secs-new (hs.timer.minutes duration)]
@@ -155,12 +184,12 @@
           (hs.settings.set "wallpaper-timer-dur" duration-secs-new)))))
 
 (print "Initalizing duration and timer")
-(init-wallpaper-duration wallpaper-duration)
+(init-WALLPAPER-DUR-MINS WALLPAPER-DUR-MINS)
 
 ;; create timer object that will change wallpaper after certain amount of time
 (local wallpaper-timer
        (hs.timer.new (hs.settings.get "wallpaper-timer-dur")
-                     (fn [] (run-rotator wallpaper-folder))))
+                     (fn [] (run-rotator WALLPAPER-FOLDER))))
 
 (print "starting wallpaper-timer")
 (wallpaper-timer:start)
@@ -189,13 +218,13 @@
 (local screen-state-watcher
        (hs.caffeinate.watcher.new (fn [event-type]
                                     (when (= event-type
-                                                 ;(or hs.caffeinate.watcher.screensaverDidStart)
-                                                 hs.caffeinate.watcher.screensDidSleep)
+                                             ;(or hs.caffeinate.watcher.screensaverDidStart)
+                                             hs.caffeinate.watcher.screensDidSleep)
                                       (pause-wallpaper-timer)
                                       (wallpaper-timer:stop))
                                     (when (= event-type
-                                             ;(or hs.caffeinate.watcher.screensaverDidStop
-                                                 hs.caffeinate.watcher.screensDidWake)
+                                             (or hs.caffeinate.watcher.screensaverDidStop
+                                                 hs.caffeinate.watcher.screensDidWake))
                                       (resume-wallpaper-timer)))))
 
 (print "starting wallpaper-timer")
@@ -205,4 +234,4 @@
 (hs.hotkey.bind ["cmd" "ctrl"] :E
                 (fn []
                   (print "Hotkey E triggered for wallpaper rotation."
-                         (run-rotator wallpaper-folder))))
+                         (run-rotator WALLPAPER-FOLDER))))

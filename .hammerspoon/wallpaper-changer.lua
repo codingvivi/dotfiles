@@ -1,10 +1,10 @@
--- :fennel:1748692498
+-- :fennel:1753792198
 local natcmp = require("string.natcmp")
-local wallpaper_folder = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
-local wallpaper_duration = 30
-local supported_UTIs_old = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
+local WALLPAPER_FOLDER = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
+local WALLPAPER_DUR_MINS = 30
+local SUPPORTED_UTIS = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
 print("UTIs supported:")
-for _, UTI in ipairs(supported_UTIs_old) do
+for _, UTI in ipairs(SUPPORTED_UTIS) do
   print(UTI)
 end
 local function get_files(folder_path)
@@ -84,6 +84,26 @@ local function calculate_next_index(file_list, current_idx)
     end
   end
 end
+local function get_available_screens()
+  print("Refreshing screens available...")
+  local screen_list = hs.screen.allScreens()
+  local screen_amount = #screen_list
+  print(("Number of screens detected: " .. screen_amount))
+  return screen_list
+end
+local available_screens = get_available_screens
+local function print_screens(screen_list)
+  for i, screen in ipairs(screen_list()) do
+    local _12_
+    do
+      local frame = screen:frame()
+      _12_ = (frame.w .. "x" .. frame.h .. " px")
+    end
+    print(("Screen " .. i .. ": " .. screen:name() .. " - " .. _12_))
+  end
+  return nil
+end
+print_screens(available_screens)
 local function change_wallpaper_on_screen(file_path, screen)
   print("test")
   if (file_path and screen) then
@@ -125,7 +145,7 @@ local function check_value_change(value_new, value_old)
   end
   return change
 end
-local function init_wallpaper_duration(duration)
+local function init_WALLPAPER_DUR_MINS(duration)
   local duration_secs_new = hs.timer.minutes(duration)
   print(("Converted duration of " .. duration .. " minutes into " .. duration_secs_new .. " seconds"))
   local duration_secs_old = hs.settings.get("wallpaper-timer-dur")
@@ -136,20 +156,20 @@ local function init_wallpaper_duration(duration)
   end
   print("checking timer change (in seconds)")
   local change = check_value_change(duration_secs_new, duration_secs_old)
-  local _17_ = print(("Adjusting timer by " .. change .. " seconds"))
-  if ((0 ~= change) or (change ~= _17_) or (_17_ ~= print("No change in duration of timer since last initialization"))) then
+  local _18_ = print(("Adjusting timer by " .. change .. " seconds"))
+  if ((0 ~= change) or (change ~= _18_) or (_18_ ~= print("No change in duration of timer since last initialization"))) then
     return hs.settings.set("wallpaper-timer-dur", duration_secs_new)
   else
     return nil
   end
 end
 print("Initalizing duration and timer")
-init_wallpaper_duration(wallpaper_duration)
+init_WALLPAPER_DUR_MINS(WALLPAPER_DUR_MINS)
 local wallpaper_timer
-local function _19_()
-  return run_rotator(wallpaper_folder)
+local function _20_()
+  return run_rotator(WALLPAPER_FOLDER)
 end
-wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _19_)
+wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _20_)
 print("starting wallpaper-timer")
 wallpaper_timer:start()
 local function pause_wallpaper_timer()
@@ -167,22 +187,22 @@ end
 hs.settings.set("remaining-wallpaper-time", 0)
 print("Initalizing screen-state watcher")
 local screen_state_watcher
-local function _20_(event_type)
+local function _21_(event_type)
   if (event_type == hs.caffeinate.watcher.screensDidSleep) then
     pause_wallpaper_timer()
     wallpaper_timer:stop()
   else
   end
-  if (event_type == hs.caffeinate.watcher.screensDidWake) then
+  if (event_type == (hs.caffeinate.watcher.screensaverDidStop or hs.caffeinate.watcher.screensDidWake)) then
     return resume_wallpaper_timer()
   else
     return nil
   end
 end
-screen_state_watcher = hs.caffeinate.watcher.new(_20_)
+screen_state_watcher = hs.caffeinate.watcher.new(_21_)
 print("starting wallpaper-timer")
 screen_state_watcher:start()
-local function _23_()
-  return print("Hotkey E triggered for wallpaper rotation.", run_rotator(wallpaper_folder))
+local function _24_()
+  return print("Hotkey E triggered for wallpaper rotation.", run_rotator(WALLPAPER_FOLDER))
 end
-return hs.hotkey.bind({"cmd", "ctrl"}, "E", _23_)
+return hs.hotkey.bind({"cmd", "ctrl"}, "E", _24_)
