@@ -4,6 +4,7 @@
 ;; utf8 sorter
 (local natcmp (require :string.natcmp))
 
+
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;                                    locals                                    ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
@@ -22,15 +23,17 @@
                        "public.png"
                        "public.tiff"])
 
+(print "~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
 (print "UTIs supported:")
 (each [_ UTI (ipairs SUPPORTED-UTIS)]
   (print UTI))
+
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;                                   helpers                                    ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ files ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
-(fn get-files [folder-path]
+(λ get-files [folder-path]
   "Returns number list with files, number of files and subdirs"
   (let [(files filenum dirnum) (hs.fs.fileListForPath folder-path
                                                       {:subdirs true})]
@@ -40,7 +43,7 @@
     (print (.. "Number of directories: " dirnum))
     (values files filenum dirnum)))
 
-(fn print-file-list [file-list]
+(λ print-file-list [file-list]
   "Print file list (for debug purposes)"
   (each [_ file (ipairs file-list)]
     (print file)))
@@ -49,7 +52,7 @@
 ;(let [(file-list b c) (get-files WALLPAPER-FOLDER)]
 ;  (print-file-list file-list))
 
-(fn hassupportedUTI? [UTI-list path]
+(λ hassupportedUTI? [UTI-list path]
   "Checks if file path matches one of the UTIs"
   (each [_ UTI (ipairs UTI-list)]
     (when (= UTI (hs.fs.fileUTI path))
@@ -58,7 +61,7 @@
 
 ; Explicitly return false if no match
 
-(fn get-supported-file-paths [UTIs file-paths]
+(λ get-supported-file-paths [UTIs file-paths]
   "Takes a list of files, returns a list of files that match a list of UTIs"
   (let [file-list []]
     (each [_ path (ipairs file-paths)]
@@ -66,7 +69,7 @@
         (table.insert file-list path)))
     file-list))
 
-(fn calculate-next-index [file-list current-idx]
+(λ calculate-next-index [file-list current-idx]
   "Calculates the next valid index for the file-list using 'case true'.
    Handles wrap-around and initialization from 0 or invalid index.
    Returns nil if file-list is empty or nil."
@@ -114,29 +117,27 @@
           (print (.. "Number of screens detected: " screen-amount))
           screen-list))))
 
-(lambda print-screen-details [screen]
+(λ print-screen-details [screen]
   "Returns text with screen name and dimensions for printing"
-  (print (.. "Screen" (screen:name) " - "
+  (print (.. "Screen " (screen:name) " - "
              (let [frame (screen:frame)]
                (.. frame.w " x " frame.h "px")))))
 
-(lambda iterate-screens [screen-list func ?args]
+(λ iterate-screens [screen-list func ?args]
   "Iterates to a list of screens running a function on each"
   (each [i screen (ipairs screen-list)]
-    (func screen)))
+    (func screen ?args)))
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~ screen + file helper combos ~~~~~~~~~~~~~~~~~~~~~~~~ ;
-(fn change-wallpaper-on-screen [screen file-path]
+(λ change-wallpaper-on-screen [screen file-path]
   "Sets the desktop image for the given screen."
-  (print "test")
-  (when (and file-path screen)
-    (let [url (.. "file://" file-path)]
-      (print (.. "Setting wallpaper to: " url))
-      (screen:desktopImageURL url))
-    (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
-    0.5))
+  (let [url (.. "file://" file-path)]
+    (print (.. "Setting wallpaper to: " url))
+    (screen:desktopImageURL url))
+  (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
+  0.5)
 
-(lambda run-rotator [folder]
+(λ run-rotator [folder]
   (let [supported-UTIs ["com.apple.pict"
                         "com.compuserve.gif"
                         "com.microsoft.bmp"
@@ -164,8 +165,8 @@
             ;... and change wallpapers
             (when next-index
               (hs.settings.set "wallpaper-index" next-index)
-              (change-wallpaper-on-screen (. image-paths next-index)
-                                          (hs.screen.mainScreen))))))))
+              (iterate-screens screens change-wallpaper-on-screen
+                               (. image-paths next-index))))))))
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ timer helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 (fn check-value-change [value-new value-old]
@@ -179,7 +180,7 @@
 ;                              initialization                                  ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 
-(fn init-WALLPAPER-DUR-MINS [duration]
+(λ init-WALLPAPER-DUR-MINS [duration]
   "Initializes timer and timer duration. 
 	Checks if there has been a duration chance since the last initalization"
   (let [duration-secs-new (hs.timer.minutes duration)]
@@ -215,19 +216,39 @@
   "gets current wallpaper-timer time, 
 	writes it to persistent var,
 	pauses"
-  (print "Screens went to sleep.")
-  (print "Saving remaining wallpaper time")
-  (hs.settings.set "remaining-wallpaper-time" (wallpaper-timer:nextTrigger))
-  (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
-  (print "Stopping wallpaper-timer"))
+  (if (not (wallpaper-timer:running))
+      (print "Warning: Timer not running. No action taken")
+      (do 
+        (print "Saving time and pausing")
+        (let [remaining-time (wallpaper-timer:nextTrigger)]
+          (print (.. "Saving remaining wallpaper time: " remaining-time " seconds"))
+          (hs.settings.set "remaining-wallpaper-time" remaining-time)
+          (print (.. "Saved " (hs.settings.get "remaining-wallpaper-time") " seconds"))
+          (wallpaper-timer:stop)
+          (print "Stopped wallpaper-timer")))))
 
 (fn resume-wallpaper-timer []
   "gets saved wallpaper-timer time, 
 	continues timer"
-  (print "Screens woke up. Resuming wallpaper-timer")
-  (print (.. (hs.settings.get "remaining-wallpaper-time") " seconds remaining"))
-  (wallpaper-timer:setNextTrigger (hs.settings.get "remaining-wallpaper-time")))
-
+  (if (wallpaper-timer:running)
+      (print "Warning: Resumer called, but timer was already running. No action taken.")
+      (do
+        (print "Timer was stopped, running resumer...")
+        (let [remaining-time (hs.settings.get "remaining-wallpaper-time")]
+          (if (not (and remaining-time (> remaining-time 0)))
+              (do
+                (print "Warning: No valid remaining time found")
+                (wallpaper-timer:start)
+                (print "Restarted wallpaper timer"))
+              (do
+                (print "Remaining time found")
+                (wallpaper-timer:setNextTrigger remaining-time)
+                (print (.. "Recalled remaining time of " remaining-time "s"))
+                (wallpaper-timer:start)
+                (print (.. "Resumed timer with " (hs.settings.get "remaining-wallpaper-time")))))))))
+                
+(local RESUME_EVENTS {hs.caffeinate.watcher.screensDidWake true
+                      hs.caffeinate.watcher.screensaverDidStop true})
 ; pause on screen off var
 (hs.settings.set "remaining-wallpaper-time" 0)
 (print "Initalizing screen-state watcher")
@@ -236,15 +257,18 @@
                                     (when (= event-type
                                              ;(or hs.caffeinate.watcher.screensaverDidStart)
                                              hs.caffeinate.watcher.screensDidSleep)
-                                      (pause-wallpaper-timer)
-                                      (wallpaper-timer:stop))
-                                    (when (= event-type
-                                             (or hs.caffeinate.watcher.screensaverDidStop
-                                                 hs.caffeinate.watcher.screensDidWake))
+                                      (print "Screens went to sleep! running pauser")
+                                      (pause-wallpaper-timer))
+                                    (when (. RESUME_EVENTS event-type)
+                                      (print "Screens have gone WOKE! running remainer")
                                       (resume-wallpaper-timer)))))
 
 (print "starting wallpaper-timer")
 (screen-state-watcher:start)
+(print "wallpaper-timer started!")
+
+;(print (.. "The value for screensaverDidStop is: "
+;           hs.caffeinate.watcher.screensaverDidStop)
 
 ;; --- Hammerspoon Hotkey Binding ---
 (hs.hotkey.bind ["cmd" "ctrl"] :E
