@@ -1,9 +1,8 @@
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
-;                                   require                                    ;
+(print "~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
-;; utf8 sorter
-(local natcmp (require :string.natcmp))
-
+;                                  requires                                    ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+(local natcmp (require :string.natcmp)) ;; utf8 sorter
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;                                    locals                                    ;
@@ -11,22 +10,25 @@
 (local WALLPAPER-FOLDER
        (.. (os.getenv :HOME) "/Pictures/Wallpaper Rotation/master"))
 
-;;in mins
 (local WALLPAPER-DUR-MINS 30)
 
-(local SUPPORTED-UTIS ["com.apple.pict"
-                       "com.compuserve.gif"
-                       "com.microsoft.bmp"
-                       "public.heic"
-                       "public.heif"
-                       "public.jpeg"
-                       "public.png"
-                       "public.tiff"])
+(local SUPPORTED-FILETYPE-UTIS ["com.apple.pict"
+                                "com.compuserve.gif"
+                                "com.microsoft.bmp"
+                                "public.heic"
+                                "public.heif"
+                                "public.jpeg"
+                                "public.png"
+                                "public.tiff"])
 
-(print "~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
-(print "UTIs supported:")
-(each [_ UTI (ipairs SUPPORTED-UTIS)]
-  (print UTI))
+(local PAUSE_EVENTS {hs.caffeinate.watcher.screensDidSleep true
+                     hs.caffeinate.watcher.screensaverDidStart true})
+(local RESUME_EVENTS {hs.caffeinate.watcher.screensDidWake true
+                      hs.caffeinate.watcher.screensaverDidStop true})
+
+;(print "UTIs supported:")
+;(each [_ UTI (ipairs SUPPORTED-FILETYPE-UTIS)]
+;  (print UTI))
 
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
@@ -138,16 +140,8 @@
   0.5)
 
 (λ run-rotator [folder]
-  (let [supported-UTIs ["com.apple.pict"
-                        "com.compuserve.gif"
-                        "com.microsoft.bmp"
-                        "public.heic"
-                        "public.heif"
-                        "public.jpeg"
-                        "public.png"
-                        "public.tiff"]
-        (cadidate-paths cadidate-num cadidate-dir-num) (get-files folder)
-        image-paths (get-supported-file-paths supported-UTIs cadidate-paths)
+  (let [(cadidate-paths cadidate-num cadidate-dir-num) (get-files folder)
+        image-paths (get-supported-file-paths SUPPORTED-FILETYPE-UTIS cadidate-paths)
         screens (get-available-screens)
         main-screen (hs.screen.mainScreen)]
     (table.sort image-paths natcmp.utf8.lt)
@@ -247,16 +241,14 @@
                 (wallpaper-timer:start)
                 (print (.. "Resumed timer with " (hs.settings.get "remaining-wallpaper-time")))))))))
                 
-(local RESUME_EVENTS {hs.caffeinate.watcher.screensDidWake true
-                      hs.caffeinate.watcher.screensaverDidStop true})
+
 ; pause on screen off var
 (hs.settings.set "remaining-wallpaper-time" 0)
 (print "Initalizing screen-state watcher")
 (local screen-state-watcher
        (hs.caffeinate.watcher.new (fn [event-type]
-                                    (when (= event-type
-                                             ;(or hs.caffeinate.watcher.screensaverDidStart)
-                                             hs.caffeinate.watcher.screensDidSleep)
+                                    (when (. PAUSE_EVENTS event-type)
+                                      (resume-wallpaper-timer)
                                       (print "Screens went to sleep! running pauser")
                                       (pause-wallpaper-timer))
                                     (when (. RESUME_EVENTS event-type)

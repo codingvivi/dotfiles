@@ -1,15 +1,13 @@
--- :fennel:1753908570
+-- :fennel:1753909506
+print("~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
 local natcmp = require("string.natcmp")
 local WALLPAPER_FOLDER = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
 local WALLPAPER_DUR_MINS = 30
-local SUPPORTED_UTIS = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
-print("~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
-print("UTIs supported:")
-for _, UTI in ipairs(SUPPORTED_UTIS) do
-  print(UTI)
-end
+local SUPPORTED_FILETYPE_UTIS = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
+local PAUSE_EVENTS = {[hs.caffeinate.watcher.screensDidSleep] = true, [hs.caffeinate.watcher.screensaverDidStart] = true}
+local RESUME_EVENTS = {[hs.caffeinate.watcher.screensDidWake] = true, [hs.caffeinate.watcher.screensaverDidStop] = true}
 local function get_files(folder_path)
-  _G.assert((nil ~= folder_path), "Missing argument folder-path on .hammerspoon/wallpaper-changer.fnl:36")
+  _G.assert((nil ~= folder_path), "Missing argument folder-path on .hammerspoon/wallpaper-changer.fnl:38")
   local files, filenum, dirnum = hs.fs.fileListForPath(folder_path, {subdirs = true})
   print(("Folder: " .. folder_path))
   print(#files)
@@ -18,15 +16,15 @@ local function get_files(folder_path)
   return files, filenum, dirnum
 end
 local function print_file_list(file_list)
-  _G.assert((nil ~= file_list), "Missing argument file-list on .hammerspoon/wallpaper-changer.fnl:46")
+  _G.assert((nil ~= file_list), "Missing argument file-list on .hammerspoon/wallpaper-changer.fnl:48")
   for _, file in ipairs(file_list) do
     print(file)
   end
   return nil
 end
 local function hassupportedUTI_3f(UTI_list, path)
-  _G.assert((nil ~= path), "Missing argument path on .hammerspoon/wallpaper-changer.fnl:55")
-  _G.assert((nil ~= UTI_list), "Missing argument UTI-list on .hammerspoon/wallpaper-changer.fnl:55")
+  _G.assert((nil ~= path), "Missing argument path on .hammerspoon/wallpaper-changer.fnl:57")
+  _G.assert((nil ~= UTI_list), "Missing argument UTI-list on .hammerspoon/wallpaper-changer.fnl:57")
   for _, UTI in ipairs(UTI_list) do
     if (UTI == hs.fs.fileUTI(path)) then
       return true
@@ -36,8 +34,8 @@ local function hassupportedUTI_3f(UTI_list, path)
   return false
 end
 local function get_supported_file_paths(UTIs, file_paths)
-  _G.assert((nil ~= file_paths), "Missing argument file-paths on .hammerspoon/wallpaper-changer.fnl:64")
-  _G.assert((nil ~= UTIs), "Missing argument UTIs on .hammerspoon/wallpaper-changer.fnl:64")
+  _G.assert((nil ~= file_paths), "Missing argument file-paths on .hammerspoon/wallpaper-changer.fnl:66")
+  _G.assert((nil ~= UTIs), "Missing argument UTIs on .hammerspoon/wallpaper-changer.fnl:66")
   local file_list = {}
   for _, path in ipairs(file_paths) do
     if hassupportedUTI_3f(UTIs, path) then
@@ -48,8 +46,8 @@ local function get_supported_file_paths(UTIs, file_paths)
   return file_list
 end
 local function calculate_next_index(file_list, current_idx)
-  _G.assert((nil ~= current_idx), "Missing argument current-idx on .hammerspoon/wallpaper-changer.fnl:72")
-  _G.assert((nil ~= file_list), "Missing argument file-list on .hammerspoon/wallpaper-changer.fnl:72")
+  _G.assert((nil ~= current_idx), "Missing argument current-idx on .hammerspoon/wallpaper-changer.fnl:74")
+  _G.assert((nil ~= file_list), "Missing argument file-list on .hammerspoon/wallpaper-changer.fnl:74")
   if (file_list == nil) then
     return print("Error: file list is nil...")
   else
@@ -106,7 +104,7 @@ local function get_available_screens()
   end
 end
 local function print_screen_details(screen)
-  _G.assert((nil ~= screen), "Missing argument screen on .hammerspoon/wallpaper-changer.fnl:120")
+  _G.assert((nil ~= screen), "Missing argument screen on .hammerspoon/wallpaper-changer.fnl:122")
   local _13_
   do
     local frame = screen:frame()
@@ -115,16 +113,16 @@ local function print_screen_details(screen)
   return print(("Screen " .. screen:name() .. " - " .. _13_))
 end
 local function iterate_screens(screen_list, func, _3fargs)
-  _G.assert((nil ~= func), "Missing argument func on .hammerspoon/wallpaper-changer.fnl:126")
-  _G.assert((nil ~= screen_list), "Missing argument screen-list on .hammerspoon/wallpaper-changer.fnl:126")
+  _G.assert((nil ~= func), "Missing argument func on .hammerspoon/wallpaper-changer.fnl:128")
+  _G.assert((nil ~= screen_list), "Missing argument screen-list on .hammerspoon/wallpaper-changer.fnl:128")
   for i, screen in ipairs(screen_list) do
     func(screen, _3fargs)
   end
   return nil
 end
 local function change_wallpaper_on_screen(screen, file_path)
-  _G.assert((nil ~= file_path), "Missing argument file-path on .hammerspoon/wallpaper-changer.fnl:132")
-  _G.assert((nil ~= screen), "Missing argument screen on .hammerspoon/wallpaper-changer.fnl:132")
+  _G.assert((nil ~= file_path), "Missing argument file-path on .hammerspoon/wallpaper-changer.fnl:134")
+  _G.assert((nil ~= screen), "Missing argument screen on .hammerspoon/wallpaper-changer.fnl:134")
   do
     local url = ("file://" .. file_path)
     print(("Setting wallpaper to: " .. url))
@@ -134,10 +132,9 @@ local function change_wallpaper_on_screen(screen, file_path)
   return 0.5
 end
 local function run_rotator(folder)
-  _G.assert((nil ~= folder), "Missing argument folder on .hammerspoon/wallpaper-changer.fnl:140")
-  local supported_UTIs = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
+  _G.assert((nil ~= folder), "Missing argument folder on .hammerspoon/wallpaper-changer.fnl:142")
   local cadidate_paths, cadidate_num, cadidate_dir_num = get_files(folder)
-  local image_paths = get_supported_file_paths(supported_UTIs, cadidate_paths)
+  local image_paths = get_supported_file_paths(SUPPORTED_FILETYPE_UTIS, cadidate_paths)
   local screens = get_available_screens()
   local main_screen = hs.screen.mainScreen()
   table.sort(image_paths, natcmp.utf8.lt)
@@ -168,7 +165,7 @@ local function check_value_change(value_new, value_old)
   return change
 end
 local function init_WALLPAPER_DUR_MINS(duration)
-  _G.assert((nil ~= duration), "Missing argument duration on .hammerspoon/wallpaper-changer.fnl:183")
+  _G.assert((nil ~= duration), "Missing argument duration on .hammerspoon/wallpaper-changer.fnl:177")
   local duration_secs_new = hs.timer.minutes(duration)
   print(("Converted duration of " .. duration .. " minutes into " .. duration_secs_new .. " seconds"))
   local duration_secs_old = hs.settings.get("wallpaper-timer-dur")
@@ -227,12 +224,12 @@ local function resume_wallpaper_timer()
     end
   end
 end
-local RESUME_EVENTS = {[hs.caffeinate.watcher.screensDidWake] = true, [hs.caffeinate.watcher.screensaverDidStop] = true}
 hs.settings.set("remaining-wallpaper-time", 0)
 print("Initalizing screen-state watcher")
 local screen_state_watcher
 local function _24_(event_type)
-  if (event_type == hs.caffeinate.watcher.screensDidSleep) then
+  if PAUSE_EVENTS[event_type] then
+    resume_wallpaper_timer()
     print("Screens went to sleep! running pauser")
     pause_wallpaper_timer()
   else
