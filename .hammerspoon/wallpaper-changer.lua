@@ -1,4 +1,4 @@
--- :fennel:1753792198
+-- :fennel:1753814806
 local natcmp = require("string.natcmp")
 local WALLPAPER_FOLDER = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
 local WALLPAPER_DUR_MINS = 30
@@ -88,23 +88,32 @@ local function get_available_screens()
   print("Refreshing screens available...")
   local screen_list = hs.screen.allScreens()
   local screen_amount = #screen_list
-  print(("Number of screens detected: " .. screen_amount))
-  return screen_list
+  if (0 == screen_amount) then
+    print("Error: No screens detected...")
+    return nil
+  else
+    print(("Number of screens detected: " .. screen_amount))
+    return screen_list
+  end
 end
-local available_screens = get_available_screens
-local function print_screens(screen_list)
-  for i, screen in ipairs(screen_list()) do
-    local _12_
-    do
-      local frame = screen:frame()
-      _12_ = (frame.w .. "x" .. frame.h .. " px")
-    end
-    print(("Screen " .. i .. ": " .. screen:name() .. " - " .. _12_))
+local function print_screen_details(screen)
+  _G.assert((nil ~= screen), "Missing argument screen on .hammerspoon/wallpaper-changer.fnl:117")
+  local _13_
+  do
+    local frame = screen:frame()
+    _13_ = (frame.w .. " x " .. frame.h .. "px")
+  end
+  return print(("Screen" .. screen:name() .. " - " .. _13_))
+end
+local function iterate_screens(screen_list, func, _3fargs)
+  _G.assert((nil ~= func), "Missing argument func on .hammerspoon/wallpaper-changer.fnl:123")
+  _G.assert((nil ~= screen_list), "Missing argument screen-list on .hammerspoon/wallpaper-changer.fnl:123")
+  for i, screen in ipairs(screen_list) do
+    func(screen)
   end
   return nil
 end
-print_screens(available_screens)
-local function change_wallpaper_on_screen(file_path, screen)
+local function change_wallpaper_on_screen(screen, file_path)
   print("test")
   if (file_path and screen) then
     do
@@ -119,21 +128,28 @@ local function change_wallpaper_on_screen(file_path, screen)
   end
 end
 local function run_rotator(folder)
+  _G.assert((nil ~= folder), "Missing argument folder on .hammerspoon/wallpaper-changer.fnl:139")
   local supported_UTIs = {"com.apple.pict", "com.compuserve.gif", "com.microsoft.bmp", "public.heic", "public.heif", "public.jpeg", "public.png", "public.tiff"}
   local cadidate_paths, cadidate_num, cadidate_dir_num = get_files(folder)
   local image_paths = get_supported_file_paths(supported_UTIs, cadidate_paths)
+  local screens = get_available_screens()
+  local main_screen = hs.screen.mainScreen()
   table.sort(image_paths, natcmp.utf8.lt)
-  if (image_paths and (#image_paths > 0)) then
-    table.sort(image_paths, natcmp.utf8.lt)
+  if not (image_paths and (#image_paths > 0) and screens and main_screen) then
+    return print("Error: something is nil that shouldnt be...")
+  else
+    print("Screens available:")
+    iterate_screens(screens, print_screen_details)
+    print("Main screen:")
+    print_screen_details(main_screen)
     local next_index = calculate_next_index(image_paths, hs.settings.get("wallpaper-index"))
+    local next_image = image_paths[next_index]
     if next_index then
       hs.settings.set("wallpaper-index", next_index)
       return change_wallpaper_on_screen(image_paths[next_index], hs.screen.mainScreen())
     else
       return nil
     end
-  else
-    return nil
   end
 end
 local function check_value_change(value_new, value_old)
@@ -156,8 +172,8 @@ local function init_WALLPAPER_DUR_MINS(duration)
   end
   print("checking timer change (in seconds)")
   local change = check_value_change(duration_secs_new, duration_secs_old)
-  local _18_ = print(("Adjusting timer by " .. change .. " seconds"))
-  if ((0 ~= change) or (change ~= _18_) or (_18_ ~= print("No change in duration of timer since last initialization"))) then
+  local _19_ = print(("Adjusting timer by " .. change .. " seconds"))
+  if ((0 ~= change) or (change ~= _19_) or (_19_ ~= print("No change in duration of timer since last initialization"))) then
     return hs.settings.set("wallpaper-timer-dur", duration_secs_new)
   else
     return nil
@@ -166,10 +182,10 @@ end
 print("Initalizing duration and timer")
 init_WALLPAPER_DUR_MINS(WALLPAPER_DUR_MINS)
 local wallpaper_timer
-local function _20_()
+local function _21_()
   return run_rotator(WALLPAPER_FOLDER)
 end
-wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _20_)
+wallpaper_timer = hs.timer.new(hs.settings.get("wallpaper-timer-dur"), _21_)
 print("starting wallpaper-timer")
 wallpaper_timer:start()
 local function pause_wallpaper_timer()
@@ -187,7 +203,7 @@ end
 hs.settings.set("remaining-wallpaper-time", 0)
 print("Initalizing screen-state watcher")
 local screen_state_watcher
-local function _21_(event_type)
+local function _22_(event_type)
   if (event_type == hs.caffeinate.watcher.screensDidSleep) then
     pause_wallpaper_timer()
     wallpaper_timer:stop()
@@ -199,10 +215,10 @@ local function _21_(event_type)
     return nil
   end
 end
-screen_state_watcher = hs.caffeinate.watcher.new(_21_)
+screen_state_watcher = hs.caffeinate.watcher.new(_22_)
 print("starting wallpaper-timer")
 screen_state_watcher:start()
-local function _24_()
+local function _25_()
   return print("Hotkey E triggered for wallpaper rotation.", run_rotator(WALLPAPER_FOLDER))
 end
-return hs.hotkey.bind({"cmd", "ctrl"}, "E", _24_)
+return hs.hotkey.bind({"cmd", "ctrl"}, "E", _25_)

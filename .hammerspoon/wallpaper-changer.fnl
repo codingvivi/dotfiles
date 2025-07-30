@@ -1,4 +1,4 @@
-; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;                                   require                                    ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;; utf8 sorter
@@ -25,6 +25,7 @@
 (print "UTIs supported:")
 (each [_ UTI (ipairs SUPPORTED-UTIS)]
   (print UTI))
+
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 ;                                   helpers                                    ;
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
@@ -100,26 +101,32 @@
 
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ screen stuff ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 (fn get-available-screens []
+  "Returns all available screens connected as a list
+	or nil if there are none"
   (print "Refreshing screens available...")
   (let [screen-list (hs.screen.allScreens)
         screen-amount (length screen-list)]
-    (print (.. "Number of screens detected: " screen-amount))
-    screen-list))
+    (if (= 0 screen-amount)
+        (do
+          (print "Error: No screens detected...")
+          nil)
+        (do
+          (print (.. "Number of screens detected: " screen-amount))
+          screen-list))))
 
-(local available-screens get-available-screens)
+(lambda print-screen-details [screen]
+  "Returns text with screen name and dimensions for printing"
+  (print (.. "Screen" (screen:name) " - "
+             (let [frame (screen:frame)]
+               (.. frame.w " x " frame.h "px")))))
 
-(fn print_screens [screen-list]
-  (each [i screen (ipairs (screen-list))]
-    ;; you can just prepend a method to the screen
-    ;; since its a hs.screen object
-    (print (.. "Screen " i ": " (screen:name) " - "
-               (let [frame (screen:frame)]
-                 (.. frame.w "x" frame.h " px"))))))
+(lambda iterate-screens [screen-list func ?args]
+  "Iterates to a list of screens running a function on each"
+  (each [i screen (ipairs screen-list)]
+    (func screen)))
 
-(print_screens available-screens)
-
-; change the wallpaper function
-(fn change-wallpaper-on-screen [file-path screen]
+; ~~~~~~~~~~~~~~~~~~~~~~~ screen + file helper combos ~~~~~~~~~~~~~~~~~~~~~~~~ ;
+(fn change-wallpaper-on-screen [screen file-path]
   "Sets the desktop image for the given screen."
   (print "test")
   (when (and file-path screen)
@@ -129,9 +136,7 @@
     (print (.. "Wallpaper: " (hs.fs.displayName file-path)))
     0.5))
 
-
-; run full wallpaper change routine
-(fn run-rotator [folder]
+(lambda run-rotator [folder]
   (let [supported-UTIs ["com.apple.pict"
                         "com.compuserve.gif"
                         "com.microsoft.bmp"
@@ -141,19 +146,28 @@
                         "public.png"
                         "public.tiff"]
         (cadidate-paths cadidate-num cadidate-dir-num) (get-files folder)
-        image-paths (get-supported-file-paths supported-UTIs cadidate-paths)]
-    (table.sort image-paths natcmp.utf8.lt) ; if image list is not nil or 0
-    (when (and image-paths (> (length image-paths) 0))
-      (table.sort image-paths natcmp.utf8.lt) ; sort list with image-paths ; calculate next index
-      (let [next-index (calculate-next-index image-paths
-                                             (hs.settings.get "wallpaper-index"))]
-        ;if index is not nil
-        (when next-index
-          (hs.settings.set "wallpaper-index" next-index) ; set system variable for index
-          (change-wallpaper-on-screen (. image-paths next-index)
-                                      (hs.screen.mainScreen)))))))
+        image-paths (get-supported-file-paths supported-UTIs cadidate-paths)
+        screens (get-available-screens)
+        main-screen (hs.screen.mainScreen)]
+    (table.sort image-paths natcmp.utf8.lt)
+    (if (not (and image-paths (> (length image-paths) 0) screens main-screen))
+        (print "Error: something is nil that shouldnt be...")
+        (do
+          ; print details
+          (print "Screens available:")
+          (iterate-screens screens print-screen-details)
+          (print "Main screen:")
+          (print-screen-details main-screen) ; Run changer: get file index...
+          (let [next-index (calculate-next-index image-paths
+                                                 (hs.settings.get "wallpaper-index"))
+                next-image (. image-paths next-index)]
+            ;... and change wallpapers
+            (when next-index
+              (hs.settings.set "wallpaper-index" next-index)
+              (change-wallpaper-on-screen (. image-paths next-index)
+                                          (hs.screen.mainScreen))))))))
 
-;; --- basic timer stuff ---
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ timer helpers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
 (fn check-value-change [value-new value-old]
   (let [change (- value-new value-old)]
     (if (= 0 change)
@@ -161,12 +175,14 @@
         (print (.. "Value has changed by " change)))
     change))
 
-;; initalize time duration
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+;                              initialization                                  ;
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;
+
 (fn init-WALLPAPER-DUR-MINS [duration]
   "Initializes timer and timer duration. 
 	Checks if there has been a duration chance since the last initalization"
   (let [duration-secs-new (hs.timer.minutes duration)]
-    ;; convert duration into seconds
     (print (.. "Converted duration of " duration " minutes into "
                duration-secs-new " seconds"))
     ;; get old duration
