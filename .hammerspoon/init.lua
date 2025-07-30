@@ -1,4 +1,5 @@
 -- Adds fennel support?
+print("============= Starting Hammerspoon! =============")
 package.path =
 package.path .. ";" .. os.getenv("HOME") .. "/.hammerspoon/?.lua"
 
@@ -7,6 +8,7 @@ fennel.path =
   package.path .. ";" .. os.getenv("HOME") .. "/.hammerspoon/?.fnl"
 table.insert(package.loaders or package.searchers, fennel.searcher)
 
+print("Loading main module...")
 require 'main'
 
 -- Auto reloads config on change
