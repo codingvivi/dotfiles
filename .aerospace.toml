@@ -228,6 +228,14 @@ shift-down = ['volume set 0', 'mode main']
     check-further-callbacks = true
     run = 'layout floating'  
 
+[[on-window-detected]]
+	if.window-title-regex-substring = 'Picture-in-Picture'
+    check-further-callbacks = true
+    run = 'layout floating'  
+
+[[on-window-detected]]
+    if.app-id = 'com.atomixproductions.virtualdj'
+	run = ['layout floating', 'move-node-to-workspace A']
 
 ## workspace d - direct messengers
 [[on-window-detected]]
