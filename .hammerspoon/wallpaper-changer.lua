@@ -1,4 +1,4 @@
--- :fennel:1753977223
+-- :fennel:1754136064
 print("~~~~~~~~~~~~~~~ wallpaper rotator ~~~~~~~~~~~~~~~")
 local natcmp = require("string.natcmp")
 local WALLPAPER_FOLDER = (os.getenv("HOME") .. "/Pictures/Wallpaper Rotation/master")
@@ -223,7 +223,6 @@ local function resume_wallpaper_timer()
 end
 hs.settings.set("remaining-wallpaper-time", 0)
 print("Initalizing screen-state watcher")
-local screen_state_watcher
 local function _24_(event_type)
   if PAUSE_EVENTS[event_type] then
     print("Screens went to sleep! running pauser")
@@ -237,9 +236,9 @@ local function _24_(event_type)
     return nil
   end
 end
-screen_state_watcher = hs.caffeinate.watcher.new(_24_)
+M["screen-state-watcher"] = hs.caffeinate.watcher.new(_24_)
 print("starting wallpaper-timer")
-screen_state_watcher:start()
+M["screen-state-watcher"]:start()
 print("wallpaper-timer started!")
 local function _27_()
   return print("Hotkey E triggered for wallpaper rotation.", run_rotator(WALLPAPER_FOLDER))

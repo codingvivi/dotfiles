@@ -33,7 +33,7 @@
        {hs.caffeinate.watcher.screensDidWake true
         hs.caffeinate.watcher.screensaverDidStop true})
 
-; (hs.settings.set "wallpaper-index" 500) ; for debugging
+;(hs.settings.set "wallpaper-index" 507) ; for debugging
 
 ; ~~~~~~~~~~~~~~~~~~~ garbage collection timer protection ~~~~~~~~~~~~~~~~~~~~ ;
 ; Global = not garbage collected, empty table = assignable
@@ -254,7 +254,7 @@
 ; pause on screen off var
 (hs.settings.set "remaining-wallpaper-time" 0)
 (print "Initalizing screen-state watcher")
-(local screen-state-watcher
+(set M.screen-state-watcher
        (hs.caffeinate.watcher.new (fn [event-type]
                                     (when (. PAUSE_EVENTS event-type)
                                       (print "Screens went to sleep! running pauser")
@@ -264,7 +264,7 @@
                                       (resume-wallpaper-timer)))))
 
 (print "starting wallpaper-timer")
-(screen-state-watcher:start)
+(M.screen-state-watcher:start)
 (print "wallpaper-timer started!")
 
 ;(print (.. "The value for screensaverDidStop is: "

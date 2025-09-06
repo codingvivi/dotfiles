@@ -1,4 +1,5 @@
--- :fennel:1753905334
+-- :fennel:1754136069
 print("In main module, loading submodules...")
 print("loading wallpaper-changer...")
-return require("wallpaper-changer")
+require("wallpaper-changer")
+return require("oled-element-toggler")
