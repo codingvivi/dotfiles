@@ -100,7 +100,9 @@ compdef _directories md
 # Define aliases.
 alias tree='tree -a -I .git'
 
-## exa ls replacement
+alias org="cd 'Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org'"
+
+## lsd ls replacement
 alias ld='lsd -lD'
 alias lf='lsd -lF --color=always | grep -v /'
 alias lh='lsd -dl .* --group-directories-first'
