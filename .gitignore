@@ -55,6 +55,10 @@
 !.hammerspoon/
 !.hammerspoon/**
 
+!.qutebrowser/
+!.qutebrowser/config.py
+
+
 #tmux
 #former not used anymore
 !.tmux.conf
