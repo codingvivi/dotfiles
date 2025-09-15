@@ -123,6 +123,18 @@ config.set('content.images', True, 'devtools://*')
 #   - access: Allow reading from and writing to the clipboard.
 #   - access-paste: Allow accessing the clipboard and pasting clipboard content.
 #   - ask: Prompt when requested (grants 'access-paste' permission).
+config.set('content.javascript.clipboard', 'access-paste', 'https://misskey.bubbletea.dev')
+
+# Allow JavaScript to read from or write to the clipboard. With
+# QtWebEngine, writing the clipboard as response to a user interaction
+# is always allowed. On Qt < 6.8, the `ask` setting is equivalent to
+# `none` and permission needs to be granted manually via this setting.
+# Type: JSClipboardPermission
+# Valid values:
+#   - none: Disable access to clipboard.
+#   - access: Allow reading from and writing to the clipboard.
+#   - access-paste: Allow accessing the clipboard and pasting clipboard content.
+#   - ask: Prompt when requested (grants 'access-paste' permission).
 config.set('content.javascript.clipboard', 'access-paste', 'https://formulae.brew.sh')
 
 # Allow JavaScript to read from or write to the clipboard. With
@@ -202,6 +214,11 @@ config.set('content.notifications.enabled', True, 'https://cuckoo.team')
 # Type: ShellCommand
 c.editor.command = ['kitty', '--single-instance', 'nvim', '{}']
 
+# Page to open if :open -t/-b/-w is used without URL. Use `about:blank`
+# for a blank page.
+# Type: FuzzyUrl
+c.url.default_page = 'file://~/.config/startpages/yet-another-generic-startpage/index.html'
+
 # Search engines which can be used via the address bar.  Maps a search
 # engine name (such as `DEFAULT`, or `ddg`) to a URL with a `{}`
 # placeholder. The placeholder will be replaced by the search term, use
@@ -221,10 +238,11 @@ c.editor.command = ['kitty', '--single-instance', 'nvim', '{}']
 # the search engine name to the search term, e.g. `:open google
 # qutebrowser`.
 # Type: Dict
-c.url.searchengines = {
-        'DEFAULT': 'https://duckduckgo.com/?q={}',
-        '!wiki': 'https://en.wikipedia.org/w/index.php?search={}'
-}
+c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}', '!wiki': 'https://en.wikipedia.org/w/index.php?search={}', '!amazon': 'https://www.amazon.de/s?k={}', '!leoe': 'https://dict.leo.org/german-english/{}'}
+
+# Page(s) to open at the start.
+# Type: List of FuzzyUrl, or FuzzyUrl
+c.url.start_pages = 'file:///Users/musicvivireal/.config/startpages/yet-another-generic-startpage/index.html'
 
 # Hide the window decoration.  This setting requires a restart on
 # Wayland.
@@ -240,6 +258,6 @@ c.colors.tabs.selected.even.fg = 'white'
 c.colors.tabs.selected.even.bg = 'black'
 
 # Bindings for normal mode
-config.bind('<Space>lv', 'hint links spawn mpv {hint-url}')
-config.bind('<Space>hrr', 'config-source')
 config.bind('<Space>fp', 'config-edit')
+config.bind('<Space>hrr', 'config-source')
+config.bind('<Space>lv', 'hint links spawn mpv {hint-url}')
