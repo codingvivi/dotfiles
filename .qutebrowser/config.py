@@ -13,6 +13,11 @@
 # Change the argument to True to still load settings configured via autoconfig.yml
 config.load_autoconfig(False)
 
+# Aliases for commands. The keys of the given dictionary are the
+# aliases, while the values are the commands they map to.
+# Type: Dict
+c.aliases = {'q': 'close', 'qa': 'quit', 'w': 'session-save', 'wq': 'quit --save', 'wqa': 'quit --save'}
+
 # Which cookies to accept. With QtWebEngine, this setting also controls
 # other features with tracking capabilities similar to those of cookies;
 # including IndexedDB, DOM storage, filesystem API, service workers, and
@@ -108,6 +113,30 @@ config.set('content.images', True, 'chrome-devtools://*')
 # Type: Bool
 config.set('content.images', True, 'devtools://*')
 
+# Allow JavaScript to read from or write to the clipboard. With
+# QtWebEngine, writing the clipboard as response to a user interaction
+# is always allowed. On Qt < 6.8, the `ask` setting is equivalent to
+# `none` and permission needs to be granted manually via this setting.
+# Type: JSClipboardPermission
+# Valid values:
+#   - none: Disable access to clipboard.
+#   - access: Allow reading from and writing to the clipboard.
+#   - access-paste: Allow accessing the clipboard and pasting clipboard content.
+#   - ask: Prompt when requested (grants 'access-paste' permission).
+config.set('content.javascript.clipboard', 'access-paste', 'https://formulae.brew.sh')
+
+# Allow JavaScript to read from or write to the clipboard. With
+# QtWebEngine, writing the clipboard as response to a user interaction
+# is always allowed. On Qt < 6.8, the `ask` setting is equivalent to
+# `none` and permission needs to be granted manually via this setting.
+# Type: JSClipboardPermission
+# Valid values:
+#   - none: Disable access to clipboard.
+#   - access: Allow reading from and writing to the clipboard.
+#   - access-paste: Allow accessing the clipboard and pasting clipboard content.
+#   - ask: Prompt when requested (grants 'access-paste' permission).
+config.set('content.javascript.clipboard', 'access-paste', 'https://github.com')
+
 # Enable JavaScript.
 # Type: Bool
 config.set('content.javascript.enabled', True, 'chrome-devtools://*')
@@ -131,6 +160,38 @@ config.set('content.local_content_can_access_remote_urls', True, 'file:///Users/
 # Allow locally loaded documents to access other local URLs.
 # Type: Bool
 config.set('content.local_content_can_access_file_urls', False, 'file:///Users/musicvivireal/Library/Application%20Support/qutebrowser/userscripts/*')
+
+# Allow websites to show notifications.
+# Type: BoolAsk
+# Valid values:
+#   - true
+#   - false
+#   - ask
+config.set('content.notifications.enabled', False, 'https://umatechnology.org')
+
+# Allow websites to show notifications.
+# Type: BoolAsk
+# Valid values:
+#   - true
+#   - false
+#   - ask
+config.set('content.notifications.enabled', True, 'https://misskey.bubbletea.dev')
+
+# Allow websites to show notifications.
+# Type: BoolAsk
+# Valid values:
+#   - true
+#   - false
+#   - ask
+config.set('content.notifications.enabled', True, 'https://fedi.layer02.net')
+
+# Allow websites to show notifications.
+# Type: BoolAsk
+# Valid values:
+#   - true
+#   - false
+#   - ask
+config.set('content.notifications.enabled', True, 'https://cuckoo.team')
 
 # Editor (and arguments) to use for the `edit-*` commands. The following
 # placeholders are defined:  * `{file}`: Filename of the file to be
@@ -160,7 +221,10 @@ c.editor.command = ['kitty', '--single-instance', 'nvim', '{}']
 # the search engine name to the search term, e.g. `:open google
 # qutebrowser`.
 # Type: Dict
-c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}'}
+c.url.searchengines = {
+        'DEFAULT': 'https://duckduckgo.com/?q={}',
+        '!wiki': 'https://en.wikipedia.org/w/index.php?search={}'
+}
 
 # Hide the window decoration.  This setting requires a restart on
 # Wayland.
@@ -174,3 +238,8 @@ c.colors.tabs.selected.even.fg = 'white'
 # Background color of selected even tabs.
 # Type: QtColor
 c.colors.tabs.selected.even.bg = 'black'
+
+# Bindings for normal mode
+config.bind('<Space>lv', 'hint links spawn mpv {hint-url}')
+config.bind('<Space>hrr', 'config-source')
+config.bind('<Space>fp', 'config-edit')
