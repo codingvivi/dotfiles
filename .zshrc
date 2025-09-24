@@ -104,12 +104,12 @@ alias tree='tree -a -I .git'
 alias org="cd 'Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org'"
 
 ## lsd ls replacement
-alias ld='lsd -lD'
-alias lf='lsd -lF --color=always | grep -v /'
-alias lh='lsd -dl .* --group-directories-first'
-alias ll='lsd -al --group-directories-first'
-alias ls='lsd -alF --color=always --sort=size | grep -v /'
-alias lt='lsd -al --sort=modified'
+alias lld='lsd -lD'
+alias llf='lsd -lF --color=always | grep -v /'
+alias llh='lsd -dl .* --group-directories-first'
+alias lll='lsd -al --group-directories-first'
+alias lls='lsd -alF --color=always --sort=size | grep -v /'
+alias llt='lsd -al --sort=modified'
 
 
 # Add flags to existing aliases.
