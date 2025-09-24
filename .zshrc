@@ -1,8 +1,8 @@
-# Personal Zsh configuration file. It is strongly recommended to keep all
-# shell customization and configuration (including exported environment
+# Personal Zsh configuration file. It is strongly recommended to keep all shell customization and configuration (including exported environment
 # variables such as PATH) in this file or in files sourced from it.
 #
 # Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md.
+
 
 # Periodic auto-update on Zsh startup: 'ask' or 'no'.
 # You can manually run `z4h update` to update everything.
@@ -98,10 +98,12 @@ compdef _directories md
 [[ -z $z4h_win_home ]] || hash -d w=$z4h_win_home
 
 # Define aliases.
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
 alias nvim='TERM=xterm-kitty nvim'
 alias tree='tree -a -I .git'
 
-alias org="cd 'Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org'"
+alias iorg="cd 'Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org'"
 
 ## lsd ls replacement
 alias lld='lsd -lD'
