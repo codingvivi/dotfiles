@@ -238,7 +238,7 @@ c.url.default_page = 'file://~/.config/startpages/yet-another-generic-startpage/
 # the search engine name to the search term, e.g. `:open google
 # qutebrowser`.
 # Type: Dict
-c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}', '!wiki': 'https://en.wikipedia.org/w/index.php?search={}', '!amazon': 'https://www.amazon.de/s?k={}', '!leoe': 'https://dict.leo.org/german-english/{}'}
+c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}', '!wiki': 'https://en.wikipedia.org/w/index.php?search={}', '!amazon': 'https://www.amazon.de/s?k={}', '!leoe': 'https://dict.leo.org/german-english/{}', '!img:': 'https://duckduckgo.com/?q={}&iar=images'}
 
 # Page(s) to open at the start.
 # Type: List of FuzzyUrl, or FuzzyUrl
@@ -258,6 +258,6 @@ c.colors.tabs.selected.even.fg = 'white'
 c.colors.tabs.selected.even.bg = 'black'
 
 # Bindings for normal mode
+config.bind(';v', 'hint links spawn mpv {hint-url}')
 config.bind('<Space>fp', 'config-edit')
 config.bind('<Space>hrr', 'config-source')
-config.bind('<Space>lv', 'hint links spawn mpv {hint-url}')
