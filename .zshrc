@@ -98,6 +98,7 @@ compdef _directories md
 [[ -z $z4h_win_home ]] || hash -d w=$z4h_win_home
 
 # Define aliases.
+alias nvim='TERM=xterm-kitty nvim'
 alias tree='tree -a -I .git'
 
 alias org="cd 'Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org'"
