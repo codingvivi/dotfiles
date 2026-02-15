@@ -1,0 +1,136 @@
+theme = "vivicarbon_translucent"
+#theme = "amberwood"
+
+[editor]
+default-yank-register = "+" # gave a separate yank register a shot and it was NOT for me
+line-number = "relative"
+# mouse = false
+# cursorline = true # Highlight all lines with a cursor
+color-modes = true # Whether to color the mode indicator with different colors depending on the mode itself
+auto-format = true
+#clipboard-provider = "pasteboard"
+completion-timeout = 5
+
+[editor.cursor-shape]
+normal = "block"
+insert = "block"
+select = "block"
+
+[editor.indent-guides]
+render = true
+#character = "╎"    # Custom character for the guide (default is "▏")
+skip-nodes = false # Whether to skip rendering guides on certain syntax nodes
+
+[editor.file-picker]
+hidden = false
+git-ignore = true
+
+[editor.inline-diagnostics]
+cursor-line = "disable"
+other-lines = "disable"
+
+[editor.statusline]
+left = ["mode", "file-type", "file-base-name", "version-control"]
+center = ["read-only-indicator"]
+right = ["diagnostics",  "primary-selection-length", "selections", "position" ,"total-line-numbers"]
+separator = "│"
+mode.normal = "RW"
+mode.insert = "**"
+mode.select = "**"
+
+
+[keys.normal.space]
+y = "@%y"
+space = "command_mode"
+
+# [b]uffer
+[keys.normal.space."b"]
+n = ":buffer-next"
+p = ":buffer-previous"
+d = ":buffer-close"
+
+# [c]ode
+[keys.normal.space."c"]
+# 4 = "@A,<esc>xs,<ret>c_test;<esc>ghwa<backspace><backspace><backspace><esc>vglyjghwa<backspace><backspace><backspace><esc>f(;ps;<ret>c,<esc>bb;bdt);d5jo"
+#<esc>hi,<esc>hvbu"
+#byUjglF(p"
+n = ":new"
+f = ":format"
+
+[keys.normal.space."d"]
+d = "diagnostics_picker"
+D = "workspace_diagnostics_picker"
+
+l = "dap_launch"
+r = "dap_restart"
+b = "dap_toggle_breakpoint"
+c = "dap_continue"
+h = "dap_pause"
+i = "dap_step_in"
+o = "dap_step_out"
+n = "dap_next"
+v = "dap_variables"
+t = "dap_terminate"
+C-c = "dap_edit_condition"
+C-l = "dap_edit_log"
+e = "dap_enable_exceptions"
+E = "dap_disable_exceptions"
+
+[keys.normal.space."d"."s"]
+t = "dap_switch_thread"
+f = "dap_switch_stack_frame"
+
+[keys.normal.space."c"."d"]
+d = "@i/* ~<esc>hy73pa */<esc>"
+
+# [keys.normal.space."c"."h"]
+# 1 = ":insert-h1!"
+# 2 = ":insert-h2!"
+# 3 = ":insert-h3!"
+# 
+[keys.normal.space."c"."d"."~"]
+# center content on line
+c = "@x|python3 -c \"import sys; print(sys.stdin.read().strip().center(80))\"<ret>"
+# wrap in multiline
+h = "@hvhhc*/ghr/r*"
+
+# [f]ile
+[keys.normal.space."f"]
+f = "file_picker"
+p = "@:config-open<ret><space>E"
+# s = ":w"
+# S = ":w!"
+# q = ":q"
+# Q = ":q!"
+
+#[h]elp (and other meta stuff)
+[keys.normal.space."h"]
+l = ":log-open"
+r = ":config-reload"
+x = "command_palette"
+# e = ":test"
+
+
+[keys.normal.space."m"."d"]
+d = "@F*oDEADLINE: ;;dtdaterevbmiwms"
+s = "@F*oSCHEDULED: ;;dtdaterevbmiwms"
+
+[keys.normal.space."m"."t"]
+d = "@gheebcDONE<esc>"
+h = "@gheebcHOLD<esc>"
+i = "@gheebcIDEA<esc>"
+k = "@gheebcKILL<esc>"
+t = "@gheebcTODO<esc>"
+w = "@gheebcWAIT<esc>"
+
+# [keys.normal.space.f.f]
+# s = ":w!"
+# q = ":q!"
+
+#[q]uit 
+# [keys.normal.space."q"]
+# s = ":wqa"
+# S = ":wqa!"
+# q = ":qa"
+# Q = ":qa!"
+

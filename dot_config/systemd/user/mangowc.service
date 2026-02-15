@@ -1,0 +1,16 @@
+[Unit]
+Description=Mango Window Compositor
+# After=default.target
+Before=mangowc.target
+Wants=mangowc.target
+
+[Service]
+Type=simple
+# Replace with the actual path to mangowc if it's different
+ExecStart=/usr/bin/mango
+# Clean up environment variables on exit
+ExecStopPost=/usr/bin/systemctl --user unset-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
+Restart=on-failure
+
+#[Install]
+# WantedBy=default.target

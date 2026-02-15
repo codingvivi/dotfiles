@@ -1,0 +1,15 @@
+[Unit]
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+# Using xrgb format often fixes "slanted" or artifacting images on Asahi/M1/M2 chips
+#ExecStart=%h/.local/bin/awww-daemon --format xrgb
+ExecStart=%h/.local/bin/awww-daemon
+Restart=on-failure
+RestartSec=5
+
+[Install]
+# This tells the service: "Wait for the exec-once signal"
+WantedBy=graphical-session.target

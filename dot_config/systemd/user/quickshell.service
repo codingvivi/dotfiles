@@ -1,0 +1,9 @@
+[Unit]
+Description=Quickshell Service
+#PartOf=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/quickshell
+
+#[Install]
+#WantedBy=graphical-session.target

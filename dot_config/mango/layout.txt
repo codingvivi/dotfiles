@@ -1,0 +1,6 @@
+                5        4        3        2         1                         1         2        3        4        5
+
++1    XXX       Y        O        U        -         J           +1+           Q         G        N        W        K        QK_BOOT   1+
+ 0    ESC       H        I        E        A         .            0            V         M        D        R        S        P         0
+-1              X        /        "        ,         ;           -1-           Z         C        L        F        B                  1-
+-2                                         MVMT      T     MODS  -2-  ESC      SPC       NUMB                                          2-

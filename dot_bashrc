@@ -1,0 +1,57 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+if [ -d ~/.bashrc.d ]; then
+    for rc in ~/.bashrc.d/*; do
+        if [ -f "$rc" ]; then
+            . "$rc"
+        fi
+    done
+fi
+unset rc
+. "$HOME/.cargo/env"
+
+export EDITOR="hx"
+export VISUAL="$EDITOR"
+
+mangov() {
+
+    echo "Starting Kanata..."
+    sudo systemctl start kanata
+
+    echo "Launching MangoWC..."
+    mango
+
+    echo "Exited MangoWC. Stopping Kanata..."
+    sudo systemctl stop kanata
+}
+
+alias em="emacsclient -c -a ''"
+
+alias yt-dlp='yt-dlp --cookies ~/.local/share/cookies.txt'
+
+alias francinette="$HOME/francinette/tester.sh"
+alias paco="$HOME/francinette/tester.sh"
+
+alias kp='flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC'
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+
+eval "$(fnm env --use-on-cd --shell bash)"
+export PATH="$HOME/.cargo/bin:$PATH"
+
+source "$HOME/.config/broot/launcher/bash/br"

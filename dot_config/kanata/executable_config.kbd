@@ -1,0 +1,113 @@
+(defcfg
+  process-unmapped-keys yes
+  concurrent-tap-hold yes
+  rapid-event-delay 5
+)
+
+(defsrc
+  esc    f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  grv    1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab    q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps   a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft   z    x    c    v    b    n    m    ,    .    /    up   rsft
+  f13    lctl lalt lmet           spc           rmet ralt left down right
+)
+
+(defalias
+  ;; --- Layer Toggles ---
+  fn_l   (layer-toggle fn)
+  fix    (layer-while-held fixes)
+
+  ;; --- Standard Modifiers ---
+  ;; wmm    (multi (one-shot 1000 lmet) (one-shot 1000 (layer-while-held wmlayer)))
+  wmm    (multi M-1)
+  em    (multi C-;)
+  ;; wm1    (multi lmet lctl)
+  ;;  wm2    (multi lmet lctl lalt)
+  wm1    (multi (one-shot 1000 lmet) (one-shot 1000 lctl))
+  wm2    (multi lmet lctl lalt)
+
+  slsft (tap-dance-eager 300 (
+    (one-shot 500 lsft) 
+    caps
+  ))
+
+  srsft (tap-dance-eager 300 (
+    (one-shot 500 rsft) 
+    caps
+  ))  
+
+  cpsw (caps-word-toggle 1000)
+;;slsft    (one-shot 1000 lsft)           
+  slctl    (one-shot 1000 lctl)           
+  slalt    (one-shot 1000 lalt)           
+
+  ;;srsft    (one-shot 1000 rsft)           
+  srctl    (one-shot 1000 rctl)           
+  sralt    (one-shot 1000 ralt)           
+
+  tty1 (multi lctl lalt f1)
+  tty2 (multi lctl lalt f2)
+  tty3 (multi lctl lalt f3)
+  tty4 (multi lctl lalt f4)
+  tty5 (multi lctl lalt f5)
+  tty6 (multi lctl lalt f6)
+  ;; --- Reload Commands (LMet + Same F-Keys) ---
+)
+
+;; (defchordsv2
+;;   (j f) ret 50 first-release ()
+;;   (d k) ret 50 first-release ()
+;;   
+;;   ;;(j k)    ret 50 first-release ()
+;;   ;;(k l)    ret 50 first-release ()
+;;   ;;(l ;)    @sralt           50 first-release ()
+;;   (j l)    (multi lsft lctl)              50 first-release ()
+;;   (j ;)    (multi lsft lalt)              50 first-release ()
+;;   (j k l)  (multi lsft lctl lalt)         50 first-release ()
+;; 
+;; ;;  (f d)    ret 50 first-release ()
+;;   ;;(d s) ret 50 first-release ()
+;;   (s a)    @slalt           50 first-release ()
+;;   (f s)    (multi rsft rctl)              50 first-release ()
+;;   (f a)    (multi rsft ralt)              50 first-release ()
+;;   (f d s)  (multi rsft rctl ralt)         50 first-release ()
+;; ) 
+
+(deflayer base
+  f12 brdn  brup   _    _    _    _    prev pp  next mute vold  volu
+  grv    1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab    q    w    e    r    t    y    u    i    o    p    [    ]    \
+  esc    a    s    d    f    g    h    j    k    l    ;    '    enter
+  @slsft   z    x    c    v    b    n    m    ,    .    / up @srsft  
+  @fn_l  lctl @srctl @wmm           spc               @em @sralt left down right
+)
+
+(deflayer fn
+  XX          f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  lalt  lctrl
+ ;; _     @tty1 @tty2 @tty3 @tty4 @tty5 @tty6 f7   f8   f9   f10  f11  f12
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _  
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _
+  _      _    _    _    _    _    _    _    _    _    _    _    _
+  lsft   _    _    _    _    _    _    _    _    _    _    _    _ 
+  _      _    _    _              _              _    _    _    _    _
+)
+
+(deflayer fixes
+  _           _    _    _    _    _    _    _    _    _    _    _    _ 
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _  
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _
+  _      _    _    _    _    _    left down up   right _    _    _
+  _      _    _    _    _    _    _    _    _    _    _    _    _ 
+  _      _    _    _              _              _    _    _    _    _
+)
+
+(deflayer wmlayer
+  _           _    _    _    _    _    _    _    _    _    _    _    _ 
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _  
+  _      _    _    _    _    _    _    _    _    _    _    _    _    _
+  _      _    _    _    _    _    _    _    _    _    _    _    _
+  _      _    _    _    _    _    _    _    _    _    _    _    _ 
+  _      _    _    _              _              _    _    _    _    _
+)
+

@@ -1,0 +1,208 @@
+
+[language-server.hx-lsp]
+command = "hx-lsp"
+
+#languages
+[language-server.clangd]
+args = ["--background-index", "--clang-tidy"]
+
+[language-server.efm]
+command = "efm-langserver"
+#[language-server.efm.config]
+#root-makers = [ ".git" ]
+# EFM requires this nested structure to map the language
+#languages = { c = [ { format-command = "c_formatter_42", format-stdin = true } ] }
+
+[[language]]
+name = "c"
+file-types = ["c", "h"]
+language-servers = [
+    { name = "efm", only-features = [ "format" ] },
+    { name = "clangd", except-features = [ "format"  ] }
+] 
+#formatter = { command = "c_formatter_42", args = []}
+auto-format = true
+indent = { tab-width = 4, unit = "	"}
+
+[[language]]
+name = "cpp"
+file-types = ["cpp", "cc", "cxx", "hpp", "hcc", "hxx"]
+formatter = { command = 'clang-format' }
+auto-format = false
+# language-servers = ["clangd"]
+
+[[language]]
+name = "toml"
+language-servers = ["taplo", {name = "hx-lsp", only-features = ["document-colors"]}]
+
+[language-server.fennel-ls]
+command = "fennel-ls"
+
+[[language]]
+name = "fennel"
+scope = "source.fennel"
+roots = [".git", "flsproject.fnl"]
+file-types = ["fnl"]
+language-servers = ["fennel-ls"]
+formatter = { command = "fnlfmt", args = ["-"]}
+
+
+[[grammar]]
+name = "fennel"
+source.git = "https://github.com/alexmozaidze/tree-sitter-fennel"
+source.rev = "ea4a536bca8997e30b22709f210f44f97e75bf7d"
+
+[[language]]
+name = "scheme"
+file-types = ["scm", "ss", "rkt", "kbd"]
+language-servers = [ "steel-language-server" ]
+formatter = { command = "schemat", args = []}
+# auto-format = true
+
+[language-server.steel-language-server]
+command = "steel-language-server"
+args = []
+
+[[language]]
+name = "org"
+language-servers = ["hx-lsp"]
+scope = "text.org"
+file-types = ["org"]
+comment-token = "#"
+
+[[grammar]]
+name = "org"
+#source.git = "https://github.com/nvim-orgmode/tree-sitter-org.git"
+source = { git = "https://github.com/nvim-orgmode/tree-sitter-org.git" , rev = "next" }
+
+
+[[language]]
+name = "python"
+language-servers = ["pylsp", "ruff"]
+auto-format = true
+scope = "source.python"
+
+[language.formatter]
+command = "ruff"
+args = ["format", "-"]
+
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+[language-server.pylsp.config.pylsp.plugins]
+pylsp_mypy.enabled = true
+pylsp_mypy.live_mode = true
+rope_autoimport.enabled = true
+
+
+
+[[language]]
+name = "plantuml"
+scope = "source.plantuml"
+file-types = ["plantuml", "puml", "wsd"]
+comment-token = "'"
+language-servers = [ "plantuml-lsp" ]
+
+[language-server.plantuml-lsp]
+command = "plantuml-lsp"
+args = [
+    "--stdlib-path=/plantuml-stdlib",
+    # Choose ONE of the following for diagnostics:
+    # "--jar-path=/path/to/plantuml.jar",
+    # "--exec-path=plantuml",
+]
+
+[[language]]
+name = "nu"
+# language-servers = ["nu_native_lsp"]
+formatter = {command = "nufmt", args = ["--stdin"]}
+
+[language-server.nu_native_lsp]
+command = "nu"
+args = ["--lsp"]
+
+
+
+# write logs to /tmp/completion.log
+# [language-server.scls.environment]
+# RUST_LOG = "info,simple-completion-language-server=info"
+# LOG_FILE = "/tmp/completion.log"
+
+# # # append language server to existed languages
+# [[language]]
+# name = "c"
+# language-servers = [ "scls", "clangd" ]
+
+# # [[language]]
+# # name = "git-commit"
+# # language-servers = [ "scls" ]
+
+# # etc..
+
+# # introduce a new language to enable completion on any doc by forcing set language with :set-language stub
+# [[language]]
+# name = "stub"
+# scope = "text.stub"
+# file-types = []
+# shebangs = []
+# roots = []
+# auto-format = false
+# language-servers = [ "scls" ]
+
+# # introduce new language server
+# [language-server.scls]
+# command = "simple-completion-language-server"
+
+# [language-server.scls.config]
+# feature_words = false                # enable completion by word
+# feature_snippets = true              # enable snippets
+# snippets_first = true                # completions will return before snippets by default
+# snippets_inline_by_word_tail = false # suggest snippets by WORD tail, for example text `xsq|` become `x^2|` when snippet `sq` has body `^2`
+# feature_unicode_input = false        # enable "unicode input"
+# feature_paths = false                # enable path completion
+# feature_citations = false            # enable citation completion (only on `citation` feature enabled)
+# 
+#[language-server.lua-language-server]
+#command = "lua-language-server"
+
+#[language-server.lua-language-server.config.Lua]
+#runtime.version = "Lua 5.3"
+
+#[language-server.lua-language-server.config.Lua.workspace]
+#checkThirdParty = "Apply"
+#library= ["~/.local/share/lua-language-server/addons/lua-d-premake5/library"]
+
+
+[[language]]
+name = "lua"
+# file-types = ["lua"]
+auto-format = false
+# language-servers = [ "lua-language-server" ]
+formatter = { command = "stylua", args = ["-", "--respect-ignores"] }
+#
+[language-server.qmlls]
+args = ["-E"]
+command = "qmlls"
+
+[[language]]
+name = "qml"
+indent = { tab-width = 4, unit = " " }
+formatter = { command = "qmlformat", args = ["-i"] }
+auto-format = true
+
+[[language]]
+name = "ini"
+file-types = ["ini", "conf", { glob = "mako/config"}]
+
+[[language]]
+name = "d2"
+scope = "source.git"
+file-types = ["d2"]
+comment-token = "#"
+roots = [""]
+indent = { tab-width = 2, unit = "  " }
+
+[[grammar]]
+source = { git = "https://github.com/ravsii/tree-sitter-d2", rev = "main" }
+name = "d2"

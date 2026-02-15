@@ -1,0 +1,5 @@
+[Unit]
+Description=MangoWC Session
+
+BindsTo=graphical-session.target
+StopWhenUnneeded=yes
