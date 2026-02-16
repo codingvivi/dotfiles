@@ -1,0 +1,75 @@
+## mako default configuration file
+
+# Font
+font=monospace 10
+
+# Colors (Hex: RRGGBBAA)
+# background-color=#285577FF
+# text-color=#FFFFFFFF
+# border-color=#4C7899FF
+
+# background-color=#A9A9A98F
+# text-color=#000000FF
+# border-color=#000000FF
+
+background-color=#000000A9
+
+text-color=#FFFFFFFF
+
+border-color=#000000FF
+
+progress-color=over #5588AAFF
+
+# Geometry
+width=300
+height=100
+anchor=top-right
+
+# Spacing
+outer-margin=0
+margin=10
+padding=5
+
+# Borders
+border-size=2
+border-radius=0
+
+# Icons
+icons=1
+icon-location=left
+icon-border-radius=0
+
+# Behavior
+markup=1
+actions=1
+history=1
+text-alignment=left
+default-timeout=0
+ignore-timeout=0
+max-visible=5
+layer=top
+
+# Grouping
+group-by=none
+
+# Output (Empty string means focused output)
+output=""
+
+# Format strings
+format=<b>%s</b>\n%b
+
+[grouped]
+format=(%g) <b>%s</b>\n%b
+
+[category=wm-mode]
+anchor=bottom-center
+outer-margin=0,0,150,0
+width=300
+height=100
+group-by=none
+text-alignment=center
+
+[summary=default]
+background-color=#2e7d32A9
+border-color=#a5d6a7FF
+text-color=#ffffffFF

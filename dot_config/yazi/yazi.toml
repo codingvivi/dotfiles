@@ -1,0 +1,23 @@
+[mgr]
+show_hidden = true
+show_symlink = true
+
+[opener]
+# Define Zathura as a custom opener
+pdf_opener = [
+	{ run = 'zathura "$@"', orphan = true, desc = "Zathura", for = "unix" }
+]
+
+[open]
+# Tell Yazi to use your 'pdf_opener' for PDF mime-types
+prepend_rules = [
+	{ mime = "application/pdf", use = "pdf_opener" }
+]
+
+[plugin]
+prepend_preloaders = [
+	{ name = "*.cb[7rz]", run = "comicthumb" },
+]
+prepend_previewers = [
+	{ name = "*.cb[7rz]", run = "comicthumb" },
+]

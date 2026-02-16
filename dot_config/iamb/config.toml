@@ -1,0 +1,7 @@
+[profiles.arcanaserver]
+user_id = "@vivi:matrix.seraphim.garden"
+
+[settings]
+image_preview = {}
+[settings.notifications]
+enabled = true

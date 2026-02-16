@@ -1,0 +1,30 @@
+
+# AOL ACCOUNT SETTINGS
+IMAPAccount aol
+Host imap.aol.com
+User {{ .email }}
+Pass {{ .emailPass }}
+TLSType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+# PipelineDepth 5
+
+# REMOTE STORAGE (The AOL server)
+IMAPStore aol-remote
+Account aol
+
+# LOCAL STORAGE (Your computer)
+MaildirStore aol-local
+SubFolders Verbatim
+# The trailing slash is important!
+Path ~/Mail/AOL/
+Inbox ~/Mail/AOL/Inbox
+
+# THE BRIDGE (Connects Remote to Local)
+Channel aol-sync
+Far :aol-remote:
+Near :aol-local:
+# This syncs everything (folders, deletions, etc.)
+Patterns *
+Create Both
+Expunge Both
+SyncState *
