@@ -14,7 +14,7 @@ def "main org roam dailies today goto" [] {
     main org roam dailies today create
   }
 
-  #run-external $env.EDITOR $note_path
+  emacsclient -c -F '((name . "OrgDailyFrame"))' -e '(org-roam-dailies-goto-today)'
 }
 
 def "main org roam dailies dir getpath" [] {

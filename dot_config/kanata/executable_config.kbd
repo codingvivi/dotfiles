@@ -80,7 +80,7 @@
   tab    q    w    e    r    t    y    u    i    o    p    [    ]    \
   esc    a    s    d    f    g    h    j    k    l    ;    '    enter
   @slsft   z    x    c    v    b    n    m    ,    .    / up @srsft  
-  @fn_l  lctl @srctl @wmm           spc               @em @sralt left down right
+  @fn_l  lctl @em @wmm           spc               @srctl @sralt left down right
 )
 
 (deflayer fn
