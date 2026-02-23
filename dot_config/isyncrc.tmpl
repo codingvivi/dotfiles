@@ -5,7 +5,7 @@ Host imap.aol.com
 User {{ .email }}
 Pass {{ .emailPass }}
 TLSType IMAPS
-CertificateFile /etc/ssl/certs/ca-certificates.crt
+CertificateFile {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" }}/etc/ssl/ca-bundle.pem{{ else if eq .chezmoi.osRelease.id "fedora" "asahi-remix" }}/etc/pki/tls/certs/ca-bundle.crt{{ else }}/etc/ssl/certs/ca-certificates.crt{{ end }}
 # PipelineDepth 5
 
 # REMOTE STORAGE (The AOL server)
