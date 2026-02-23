@@ -114,8 +114,8 @@ cargo:
   - cmd: iamb
 
 uv:
-  # email client
-  - alot
+  - name: alot
+    which: alot
 
 go:
   # repo manager

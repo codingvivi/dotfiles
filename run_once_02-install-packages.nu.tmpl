@@ -84,7 +84,11 @@ $cargo_tools
 # ── uv tool installs ──────────────────────────────────────────────────────────
 
 {{ range .uv -}}
-if (which {{ . }} | is-empty) { uv tool install {{ . }} }
+{{- if kindIs "string" . }}
+uv tool install {{ . }}
+{{- else }}
+if (which {{ .which }} | is-empty) { uv tool install {{ .name }} }
+{{- end }}
 {{ end -}}
 
 # ── go installs ───────────────────────────────────────────────────────────────
@@ -106,3 +110,5 @@ print ""
 print "NOTE: swww is installed but your configs reference 'awww-daemon'."
 print "      The swww binary is 'swww-daemon' — update your systemd service and awww-daemon.service if needed."
 {{ end -}}
+
+print "essential package check: done!"
