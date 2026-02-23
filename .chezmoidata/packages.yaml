@@ -96,22 +96,22 @@ fedora:
     - golang
 
 cargo:
-  - cmd: nu
+  - nu
   # file managers
-  - cmd: yazi
-  - cmd: broot
+  - yazi
+  - broot
   # audio mixer
-  - cmd: wiremix
+  - wiremix
   # keyboard remapper
-  - cmd: kanata
+  - kanata
   # music client
   - cmd: rmpc
     in-args: ["--git", "https://github.com/mierak/rmpc"]
   # clipboard
-  - cmd: wl-clip-persist
+  - wl-clip-persist
   # chats
-  - cmd: aparte
-  - cmd: iamb
+  - aparte
+  - iamb
 
 uv:
   - name: alot

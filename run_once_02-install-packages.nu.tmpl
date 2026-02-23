@@ -61,25 +61,13 @@ error make {msg: $"Unsupported distro: {{ .chezmoi.osRelease.id }}"}
 
 # ── cargo installs ────────────────────────────────────────────────────────────
 
-let cargo_tools = [
-    {{- range .cargo }}
-    {{- if (index . "in-args") }}
-    {cmd: "{{ .cmd }}", "in-args": {{ index . "in-args" | toJson }}}
-    {{- else }}
-    {cmd: "{{ .cmd }}"}
-    {{- end }}
-    {{- end }}
-]
-
-$cargo_tools
-    | where {|tool| (which $tool.cmd | is-empty)}
-    | each {|tool|
-        if ($tool."in-args"? | is-empty) {
-            ^cargo install $tool.cmd
-        } else {
-            ^cargo install ...$tool."in-args"
-        }
-    }
+{{ range .cargo -}}
+{{- if kindIs "string" . }}
+if (which {{ . }} | is-empty) { ^cargo install {{ . }} }
+{{- else }}
+if (which {{ .cmd }} | is-empty) { ^cargo install{{ if (index . "in-args") }} {{ index . "in-args" | join " " }}{{ else }} {{ .cmd }}{{ end }} }
+{{- end }}
+{{ end -}}
 
 # ── uv tool installs ──────────────────────────────────────────────────────────
 
