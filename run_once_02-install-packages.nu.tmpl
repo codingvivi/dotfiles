@@ -2,24 +2,58 @@
 
 {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 
-{{ range .packages.opensuse.zypper -}}
+{{ range .opensuse.zypper -}}
 {{ if .repo -}}
-sudo zypper addrepo --refresh "{{ .repo }}"
+try { sudo zypper addrepo --refresh "{{ .repo }}" }
 sudo zypper refresh
 {{ end -}}
-sudo zypper --non-interactive install{{ range .packages }} "{{ . }}"{{ end }}
+let pkg_checks = [
+    {{- range .packages }}
+    {{- if kindIs "string" . }}
+    {pkg: "{{ . }}", check: "rpm"}
+    {{- else }}
+    {pkg: "{{ .name }}", check: "which", bin: "{{ .which }}"}
+    {{- end }}
+    {{- end }}
+]
+let missing = ($pkg_checks
+    | where {|p|
+        if $p.check == "rpm" {
+            (^rpm -q $p.pkg | complete).exit_code != 0
+        } else {
+            (which $p.bin | is-empty)
+        }
+    }
+    | get pkg)
+if ($missing | is-not-empty) {
+    sudo zypper --non-interactive install ...$missing
+}
 
 {{ end -}}
 
-{{ else if eq .chezmoi.osRelease.id "fedora" -}}
+{{ else if eq .chezmoi.osRelease.id "fedora" "fedora-asahi-remix" -}}
 
-let dnf_packages = [
-    {{- range .packages.fedora.dnf }}
-    "{{ . }}"
+let pkg_checks = [
+    {{- range .fedora.dnf }}
+    {{- if kindIs "string" . }}
+    {pkg: "{{ . }}", check: "rpm"}
+    {{- else }}
+    {pkg: "{{ .name }}", check: "which", bin: "{{ .which }}"}
+    {{- end }}
     {{- end }}
 ]
-
-sudo dnf install -y ...$dnf_packages
+let missing = ($pkg_checks
+    | where {|p|
+        if $p.check == "rpm" {
+            (^rpm -q $p.pkg | complete).exit_code != 0
+        } else {
+            (which $p.bin | is-empty)
+        }
+    }
+    | get pkg)
+if ($missing | is-not-empty) {
+    sudo dnf install -y --skip-unavailable --skip-broken ...$missing
+}
 
 {{ else -}}
 error make {msg: $"Unsupported distro: {{ .chezmoi.osRelease.id }}"}
@@ -28,7 +62,7 @@ error make {msg: $"Unsupported distro: {{ .chezmoi.osRelease.id }}"}
 # ── cargo installs ────────────────────────────────────────────────────────────
 
 let cargo_tools = [
-    {{- range .packages.cargo }}
+    {{- range .cargo }}
     {{- if (index . "in-args") }}
     {cmd: "{{ .cmd }}", "in-args": {{ index . "in-args" | toJson }}}
     {{- else }}
@@ -49,14 +83,14 @@ $cargo_tools
 
 # ── uv tool installs ──────────────────────────────────────────────────────────
 
-{{ range .packages.uv -}}
-uv tool install {{ . }}
+{{ range .uv -}}
+if (which {{ . }} | is-empty) { uv tool install {{ . }} }
 {{ end -}}
 
 # ── go installs ───────────────────────────────────────────────────────────────
 
 let go_tools = [
-    {{- range .packages.go }}
+    {{- range .go }}
     {cmd: "{{ .cmd }}", args: {{ .args | toJson }}}
     {{- end }}
 ]
@@ -67,8 +101,8 @@ $go_tools
 
 # ── heads up ──────────────────────────────────────────────────────────────────
 
+{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 print ""
 print "NOTE: swww is installed but your configs reference 'awww-daemon'."
 print "      The swww binary is 'swww-daemon' — update your systemd service and awww-daemon.service if needed."
-print ""
-print "NOTE: binds_float.conf launches 'pomodoro' (rust-cli-pomodoro) which you removed — update that bind to use 'pomo'."
+{{ end -}}

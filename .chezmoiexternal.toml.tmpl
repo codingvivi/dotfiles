@@ -4,12 +4,12 @@ url = "https://github.com/GORAlexComp/AppleColorEmojiFont/raw/58d87f7b5da4625ecc
 exact = true
 
 # verify that "glide" is the correct path inside the tarball before applying
-[".local/bin/glide"]
-type = "archive-file"
-{{ if eq .chezmoi.arch "amd64" -}}
-url = "https://github.com/glide-browser/glide/releases/download/0.1.59a/glide.linux-x86_64.tar.xz"
-{{ else if eq .chezmoi.arch "arm64" -}}
-url = "https://github.com/glide-browser/glide/releases/download/0.1.59a/glide.linux-aarch64.tar.xz"
-{{ end -}}
-path = "glide"
-executable = true
+# [".local/bin/glide"]
+# type = "archive-file"
+# {{ if eq .chezmoi.arch "amd64" -}}
+# url = "https://github.com/glide-browser/glide/releases/download/0.1.59a/glide.linux-x86_64.tar.xz"
+# {{ else if eq .chezmoi.arch "arm64" -}}
+# url = "https://github.com/glide-browser/glide/releases/download/0.1.59a/glide.linux-aarch64.tar.xz"
+# {{ end -}}
+# path = "glide"
+# executable = true
