@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
+zypper --non-interactive install nushell
+{{ else if eq .chezmoi.osRelease.id "fedora" -}}
+dnf install --assumeyes nushell
+{{ else -}}
+echo "Unsupported distro: {{ .chezmoi.osRelease.id }}" >&2
+exit 1
+{{ end -}}
