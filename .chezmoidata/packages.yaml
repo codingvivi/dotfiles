@@ -1,0 +1,121 @@
+opensuse:
+  zypper:
+    - packages:
+        # brightness
+        - brightnessctl
+        # editors
+        - helix
+        - emacs
+        # terminal
+        - foot
+        # bar / notifications / idle
+        - waybar
+        - mako
+        - hypridle
+        # clipboard
+        - cliphist
+        - wl-clipboard
+        # shell
+        - nushell
+        # launcher
+        - rofi
+        # file managers / viewers
+        - yazi
+        - broot
+        - feh
+        - zathura
+        - zathura-plugin-pdf-mupdf
+        - zathura-plugin-pdf-poppler
+        # audio
+        - pipewire
+        - pipewire-pulseaudio
+        - wireplumber
+        # music
+        - mpd
+        # email
+        - isync
+        - notmuch
+        # browser
+        - qutebrowser
+        # matrix
+        - iamb
+        # wallpaper
+        - swww
+        # bluetooth
+        - bluez
+        # toolchains
+        - uv
+        - go
+
+    - repo: "https://download.opensuse.org/repositories/home:kaiman/openSUSE_Tumbleweed/home:kaiman.repo"
+      packages:
+        - mangowc
+
+    - repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/openSUSE_Tumbleweed/home:mantarimay:sway.repo"
+      packages:
+        - swaylock-effects
+
+fedora:
+  dnf:
+    # editors
+    - helix
+    - emacs
+    # terminal
+    - foot
+    # bar / notifications / idle
+    - waybar
+    - mako
+    - hypridle
+    # clipboard
+    - cliphist
+    - wl-clipboard
+    # shell
+    - nushell
+    # file managers / viewers
+    - yazi
+    - broot
+    - feh
+    - zathura
+    - zathura-plugins-all
+    # audio
+    - pipewire
+    - pipewire-pulseaudio
+    - wireplumber
+    # music
+    - mpd
+    - beets
+    # email
+    - isync
+    - notmuch
+    # browser
+    - qutebrowser
+    # matrix
+    - iamb
+    # toolchains
+    - uv
+    - golang
+
+cargo:
+  # audio mixer
+  - cmd: wiremix
+  # keyboard remapper
+  - cmd: kanata
+  # music client
+  - cmd: rmpc
+    in-args: ["--git", "https://github.com/mierak/rmpc"]
+  # clipboard
+  - cmd: wl-clip-persist
+  # xmpp
+  - cmd: aparte
+
+uv:
+  # email client
+  - alot
+
+go:
+  # repo manager
+  - cmd: ghq
+    args: [github.com/x-motemen/ghq@latest]
+  # pomodoro
+  - cmd: pomo
+    args: [codeberg.org/kevinschoon/pomo/cmd/pomo@latest]
