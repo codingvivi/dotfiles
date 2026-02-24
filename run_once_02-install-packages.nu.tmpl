@@ -80,20 +80,20 @@ print $"resolved ($packages | length) packages for ($distro)"
 
 # ── install functions ─────────────────────────────────────────────────────────
 
+def not-installed [] {
+    $in | where {|p|
+        match $p.check {
+            "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
+            "which" => { which $p.bin | is-empty }
+        }
+    }
+}
+
 def install-pkg [distro: string] {
     let pkgs = $in
 
     # Packages without a repo: batch check → single install call
-    let missing = ($pkgs
-        | where {|p| "repo" not-in $p}
-        | where {|p|
-            match $p.check {
-                "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
-                "which" => { which $p.bin | is-empty }
-            }
-        }
-        | get pkg
-    )
+    let missing = $pkgs | where {|p| "repo" not-in $p} | not-installed | get pkg
 
     if ($missing | is-not-empty) {
         print $"  pkg: installing ($missing | length) missing: ($missing | str join ', ')"
@@ -108,12 +108,7 @@ def install-pkg [distro: string] {
     # Packages with a repo: filter to uninstalled, add repo + install individually
     $pkgs
         | where {|p| "repo" in $p}
-        | where {|p|
-            match $p.check {
-                "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
-                "which" => { which $p.bin | is-empty }
-            }
-        }
+        | not-installed
         | each {|p|
             print $"  pkg (repo): installing ($p.name)..."
             try { sudo zypper addrepo --refresh $p.repo }
@@ -122,34 +117,25 @@ def install-pkg [distro: string] {
         }
 }
 
-def install-cargo [] {
+def install-args [] {
+    let p = $in
+    match ("args" in $p) {
+        true => $p.args
+        _    => [$p.name]
+    }
+}
+
+def install-tool [via: string] {
     $in
-        | where {|p| which $p.bin | is-empty}
+        | not-installed
         | each {|p|
-            print $"  cargo: installing ($p.name)..."
-            let args = match ("args" in $p) {
-                true => $p.args
-                _    => [$p.name]
+            print $"  ($via): installing ($p.name)..."
+            let args = $p | install-args
+            match $via {
+                "cargo" => { ^cargo install ...$args }
+                "uv"    => { ^uv tool install ...$args }
+                "go"    => { ^go install ...$args }
             }
-            ^cargo install ...$args
-        }
-}
-
-def install-uv [] {
-    $in
-        | where {|p| which $p.bin | is-empty}
-        | each {|p|
-            print $"  uv: installing ($p.name)..."
-            ^uv tool install $p.name
-        }
-}
-
-def install-go [] {
-    $in
-        | where {|p| which $p.bin | is-empty}
-        | each {|p|
-            print $"  go: installing ($p.name)..."
-            ^go install ...$p.args
         }
 }
 
@@ -159,12 +145,12 @@ print "── pkg ────────────────────�
 $packages | where via == "pkg"   | install-pkg $distro
 
 print "── cargo ────────────────────────────────────────"
-$packages | where via == "cargo" | install-cargo
+$packages | where via == "cargo" | install-tool "cargo"
 
 print "── uv ───────────────────────────────────────────"
-$packages | where via == "uv"    | install-uv
+$packages | where via == "uv"    | install-tool "uv"
 
 print "── go ───────────────────────────────────────────"
-$packages | where via == "go"    | install-go
+$packages | where via == "go"    | install-tool "go"
 
 print "── done ─────────────────────────────────────────"
