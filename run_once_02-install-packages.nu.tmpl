@@ -1,102 +1,148 @@
 #!/usr/bin/env nu
 
-{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
+let yaml_path = "{{ .chezmoi.sourceDir }}/.chezmoidata/packages.yaml"
 
-{{ range .opensuse.zypper -}}
-{{ if .repo -}}
-try { sudo zypper addrepo --refresh "{{ .repo }}" }
-sudo zypper refresh
-{{ end -}}
-let pkg_checks = [
-    {{- range .packages }}
-    {{- if kindIs "string" . }}
-    {pkg: "{{ . }}", check: "rpm"}
-    {{- else }}
-    {pkg: "{{ .name }}", check: "which", bin: "{{ .which }}"}
-    {{- end }}
-    {{- end }}
-]
-let missing = ($pkg_checks
-    | where {|p|
-        if $p.check == "rpm" {
-            (^rpm -q $p.pkg | complete).exit_code != 0
-        } else {
-            (which $p.bin | is-empty)
-        }
-    }
-    | get pkg)
-if ($missing | is-not-empty) {
-    sudo zypper --non-interactive install ...$missing
+# ── distro detection ──────────────────────────────────────────────────────────
+
+let os_id = (open /etc/os-release
+    | lines
+    | parse "{key}={value}"
+    | where key == "ID"
+    | first
+    | get value
+    | str trim --char '"')
+
+let distro = match $os_id {
+    "opensuse-tumbleweed" | "opensuse-leap" | "opensuse" => "opensuse"
+    "fedora" | "fedora-asahi-remix" => "fedora"
+    _ => { error make {msg: $"Unsupported distro: ($os_id)"} }
 }
 
-{{ end -}}
+# ── package resolution ────────────────────────────────────────────────────────
 
-{{ else if eq .chezmoi.osRelease.id "fedora" "fedora-asahi-remix" -}}
+# Resolves a single YAML entry against the current distro.
+# Returns a normalized record, or null if the entry should be skipped.
+def resolve [distro: string] {
+    let entry = $in
 
-let pkg_checks = [
-    {{- range .fedora.dnf }}
-    {{- if kindIs "string" . }}
-    {pkg: "{{ . }}", check: "rpm"}
-    {{- else }}
-    {pkg: "{{ .name }}", check: "which", bin: "{{ .which }}"}
-    {{- end }}
-    {{- end }}
-]
-let missing = ($pkg_checks
-    | where {|p|
-        if $p.check == "rpm" {
-            (^rpm -q $p.pkg | complete).exit_code != 0
-        } else {
-            (which $p.bin | is-empty)
-        }
+    # Normalize: plain string → minimal record
+
+    let base = match ($entry | describe) {
+      "string" => {name: $entry}
+      _ => $entry
     }
-    | get pkg)
-if ($missing | is-not-empty) {
-    sudo dnf install -y --skip-unavailable --skip-broken ...$missing
+
+    # Get this distro's override block (null if absent)
+    let distro_block = $base | get -o $distro
+
+    # Check if any distro block claims exclusive ownership
+    let has_exclusive = (
+        ["opensuse" "fedora"]
+        | any {|d| ($d in $base) and (($base | get $d | get -o install) == "exclusive") }
+    )
+
+    let this_install = if $distro_block != null { $distro_block | get -o install } else { null }
+
+    let skip = ($this_install == "ignore") or ($has_exclusive and $this_install != "exclusive")
+
+    if not $skip {
+        # Merge distro block over base, then strip all meta keys
+        let merged = if $distro_block != null { $base | merge $distro_block } else { $base }
+        let cleaned = (
+            ["opensuse" "fedora" "install"]
+            | reduce -f $merged {|k, acc |
+                match ($k in $acc) {
+                    true => { $acc | reject $k }
+                    _ => $acc
+                }
+            }
+        )
+
+        # Apply defaults for omitted fields
+        let via   = $cleaned | get -o via   | default "pkg"
+        let bin   = $cleaned | get -o bin   | default $cleaned.name
+        let pkg   = $cleaned | get -o pkg   | default $cleaned.name
+        let check = $cleaned | get -o check | default (if $via == "pkg" { "rpm" } else { "which" })
+
+        $cleaned | merge {via: $via, check: $check, bin: $bin, pkg: $pkg}
+    }
 }
 
-{{ else -}}
-error make {msg: $"Unsupported distro: {{ .chezmoi.osRelease.id }}"}
-{{ end -}}
+# ── load and resolve ──────────────────────────────────────────────────────────
 
-# ── cargo installs ────────────────────────────────────────────────────────────
+let packages = (open $yaml_path).packages
+    | each {|e| $e | resolve $distro}
+    | compact
 
-{{ range .cargo -}}
-{{- if kindIs "string" . }}
-if (which {{ . }} | is-empty) { ^cargo install {{ . }} }
-{{- else }}
-if (which {{ .cmd }} | is-empty) { ^cargo install{{ if (index . "in-args") }} {{ index . "in-args" | join " " }}{{ else }} {{ .cmd }}{{ end }} }
-{{- end }}
-{{ end -}}
+# ── install functions ─────────────────────────────────────────────────────────
 
-# ── uv tool installs ──────────────────────────────────────────────────────────
+def install-pkg [distro: string] {
+    let pkgs = $in
 
-{{ range .uv -}}
-{{- if kindIs "string" . }}
-uv tool install {{ . }}
-{{- else }}
-if (which {{ .which }} | is-empty) { uv tool install {{ .name }} }
-{{- end }}
-{{ end -}}
+    # Packages without a repo: batch check → single install call
+    let missing = ($pkgs
+        | where {|p| "repo" not-in $p}
+        | where {|p|
+            match $p.check {
+                "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
+                "which" => { which $p.bin | is-empty }
+            }
+        }
+        | get pkg
+    )
 
-# ── go installs ───────────────────────────────────────────────────────────────
+    if ($missing | is-not-empty) {
+        match $distro {
+            "opensuse" => { sudo zypper --non-interactive install ...$missing }
+            "fedora"   => { sudo dnf install -y --skip-unavailable --skip-broken ...$missing }
+        }
+    }
 
-let go_tools = [
-    {{- range .go }}
-    {cmd: "{{ .cmd }}", args: {{ .args | toJson }}}
-    {{- end }}
-]
+    # Packages with a repo: filter to uninstalled, add repo + install individually
+    $pkgs
+        | where {|p| "repo" in $p}
+        | where {|p|
+            match $p.check {
+                "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
+                "which" => { which $p.bin | is-empty }
+            }
+        }
+        | each {|p|
+            try { sudo zypper addrepo --refresh $p.repo }
+            sudo zypper refresh
+            sudo zypper --non-interactive install $p.pkg
+        }
+}
 
-$go_tools
-    | where {|tool| (which $tool.cmd | is-empty)}
-    | each {|tool| ^go install ...$tool.args}
+def install-cargo [] {
+    $in
+        | where {|p| which $p.bin | is-empty}
+        | each {|p|
+            let args = match ("args" in $p) {
+                true => $p.args
+                _    => [$p.name]
+            }
+            ^cargo install ...$args
+        }
+}
 
-# ── heads up ──────────────────────────────────────────────────────────────────
+def install-uv [] {
+    $in
+        | where {|p| which $p.bin | is-empty}
+        | each {|p| ^uv tool install $p.name}
+}
 
-{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
-print ""
-print "NOTE: swww is installed but your configs reference 'awww-daemon'."
-print "      The swww binary is 'swww-daemon' — update your systemd service and awww-daemon.service if needed."
-{{ end -}}
+def install-go [] {
+    $in
+        | where {|p| which $p.bin | is-empty}
+        | each {|p| ^go install ...$p.args}
+}
 
-print "essential package check: done!"
+# ── main ──────────────────────────────────────────────────────────────────────
+
+$packages | where via == "pkg"   | install-pkg $distro
+$packages | where via == "cargo" | install-cargo
+$packages | where via == "uv"    | install-uv
+$packages | where via == "go"    | install-go
+
+print "package install: done!"

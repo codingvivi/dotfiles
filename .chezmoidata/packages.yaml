@@ -1,126 +1,138 @@
-opensuse:
-  zypper:
-    - packages:
-        # brightness
-        - brightnessctl
-        # editors
-        - helix
-        - emacs
-        # terminal
-        - foot
-        # bar / notifications / idle
-        - waybar
-        - mako
-        - hypridle
-        # clipboard
-        - cliphist
-        - wl-clipboard
-        # shell
-        - nushell
-        # launcher
-        - rofi
-        # file managers / viewers
-        - yazi
-        - broot
-        - feh
-        - zathura
-        - zathura-plugin-pdf-mupdf
-        - zathura-plugin-pdf-poppler
-        # audio
-        - pipewire
-        - pipewire-pulseaudio
-        - wireplumber
-        # music
-        - mpd
-        # email
-        - gpgme-devel
-        - isync
-        - notmuch
-        # browser
-        - qutebrowser
-        # matrix
-        - iamb
-        # wallpaper
-        - swww
-        # bluetooth
-        - bluez
-        # toolchains
-        - uv
-        - go
+packages:
+  # ── brightness ────────────────────────────────────────────────────────────────
+  - brightnessctl
 
-    - repo: "https://download.opensuse.org/repositories/home:kaiman/openSUSE_Tumbleweed/home:kaiman.repo"
-      packages:
-        - mangowc
+  # ── editors ───────────────────────────────────────────────────────────────────
+  - helix
+  - emacs
 
-    - repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/openSUSE_Tumbleweed/home:mantarimay:sway.repo"
-      packages:
-        - swaylock-effects
+  # ── terminal ──────────────────────────────────────────────────────────────────
+  - foot
 
-fedora:
-  dnf:
-    # editors
-    - helix
-    - emacs
-    # terminal
-    - foot
-    # bar / notifications / idle
-    # - waybar
-    - mako
-    - hypridle
-    # clipboard
-    - cliphist
-    - wl-clipboard
-    # shell
-    # file managers / viewers
-    - feh
-    - zathura
-    - zathura-plugins-all
-    # audio
-    - pipewire
-    - pipewire-pulseaudio
-    - wireplumber
-    # music
-    - mpd
-    - beets
-    # email
-    - alot
-    - gpgme-devel
-    - isync
-    - notmuch
-    # browser
-    - qutebrowser
-    # matrix
-    # toolchains
-    - name: uv
-      which: uv
-    - golang
+  # ── bar / notifications / idle ────────────────────────────────────────────────
+  - name: waybar
+    fedora:
+      install: ignore
+  - mako
+  - hypridle
 
-cargo:
-  - nu
-  # file managers
-  - yazi
-  - broot
-  # audio mixer
-  - wiremix
-  # keyboard remapper
-  - kanata
-  # music client
-  - cmd: rmpc
-    in-args: ["--git", "https://github.com/mierak/rmpc"]
-  # clipboard
-  - wl-clip-persist
-  # chats
-  - aparte
-  - iamb
+  # ── clipboard ─────────────────────────────────────────────────────────────────
+  - cliphist
+  - wl-clipboard
+  - name: wl-clip-persist
+    via: cargo
 
-uv:
+  # ── shell ─────────────────────────────────────────────────────────────────────
+  - nushell
+
+  # ── launcher ──────────────────────────────────────────────────────────────────
+  - name: rofi
+    opensuse:
+      install: exclusive
+
+  # ── file managers ─────────────────────────────────────────────────────────────
+  - feh
+  - name: yazi
+    via: cargo
+    opensuse:
+      via: pkg
+  - name: broot
+    via: cargo
+    opensuse:
+      via: pkg
+
+  # ── file viewers ──────────────────────────────────────────────────────────────
+  - zathura
+  - name: zathura-plugin-pdf-mupdf
+    opensuse:
+      install: exclusive
+  - name: zathura-plugin-pdf-poppler
+    opensuse:
+      install: exclusive
+  - name: zathura-plugins-all
+    fedora:
+      install: exclusive
+
+  # ── audio ─────────────────────────────────────────────────────────────────────
+  - pipewire
+  - pipewire-pulseaudio
+  - wireplumber
+  - name: wiremix
+    via: cargo
+
+  # ── music ─────────────────────────────────────────────────────────────────────
+  - mpd
+  - name: beets
+    fedora:
+      install: exclusive
+  - name: rmpc
+    via: cargo
+    args: ["--git", "https://github.com/mierak/rmpc"]
+
+  # ── email ─────────────────────────────────────────────────────────────────────
+  - gpgme-devel
+  - isync
+  - notmuch
   - name: alot
-    which: alot
+    via: uv
+    fedora:
+      via: pkg
 
-go:
-  # repo manager
-  - cmd: ghq
-    args: [github.com/x-motemen/ghq@latest]
-  # pomodoro
-  - cmd: pomo
-    args: [codeberg.org/kevinschoon/pomo/cmd/pomo@latest]
+  # ── browser ───────────────────────────────────────────────────────────────────
+  - qutebrowser
+
+  # ── wallpaper ─────────────────────────────────────────────────────────────────
+  - name: swww
+    opensuse:
+      install: exclusive
+
+  # ── compositor ────────────────────────────────────────────────────────────────
+  - name: mangowc
+    opensuse:
+      install: exclusive
+      repo: "https://download.opensuse.org/repositories/home:kaiman/openSUSE_Tumbleweed/home:kaiman.repo"
+
+  # ── lock screen ───────────────────────────────────────────────────────────────
+  - name: swaylock-effects
+    opensuse:
+      install: exclusive
+      repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/openSUSE_Tumbleweed/home:mantarimay:sway.repo"
+
+  # ── bluetooth ─────────────────────────────────────────────────────────────────
+  - name: bluez
+    opensuse:
+      install: exclusive
+
+  # ── comms ─────────────────────────────────────────────────────────────────────
+  - name: aparte
+    via: cargo
+  - name: iamb
+    via: cargo
+    opensuse:
+      via: pkg
+
+  # ── keyboard ──────────────────────────────────────────────────────────────────
+  - name: kanata
+    via: cargo
+    opensuse:
+      via: pkg
+      repo: "https://download.opensuse.org/repositories/home:alternateved/openSUSE_Tumbleweed/home:alternateved.repo"
+
+  # ── toolchains ────────────────────────────────────────────────────────────────
+  - name: uv
+    via: pkg
+    check: which
+
+  - name: go
+    via: pkg
+    fedora:
+      pkg: golang
+
+  # ── dev tools ─────────────────────────────────────────────────────────────────
+  - name: ghq
+    via: go
+    args: ["github.com/x-motemen/ghq@latest"]
+
+  - name: pomo
+    via: go
+    args: ["codeberg.org/kevinschoon/pomo/cmd/pomo@latest"]
