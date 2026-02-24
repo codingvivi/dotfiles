@@ -23,7 +23,8 @@ packages:
     via: cargo
 
   # ── shell ─────────────────────────────────────────────────────────────────────
-  - nushell
+  - nu
+  - fish
 
   # ── launcher ──────────────────────────────────────────────────────────────────
   - name: rofi
@@ -128,6 +129,8 @@ packages:
     fedora:
       pkg: golang
 
+  - name: cargo-update
+    via: cargo
   # ── dev tools ─────────────────────────────────────────────────────────────────
   - name: ghq
     via: go

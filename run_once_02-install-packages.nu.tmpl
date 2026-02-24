@@ -70,9 +70,13 @@ def resolve [distro: string] {
 
 # ── load and resolve ──────────────────────────────────────────────────────────
 
+print $"detecting distro: ($distro)"
+
 let packages = (open $yaml_path).packages
     | each {|e| $e | resolve $distro}
     | compact
+
+print $"resolved ($packages | length) packages for ($distro)"
 
 # ── install functions ─────────────────────────────────────────────────────────
 
@@ -92,10 +96,13 @@ def install-pkg [distro: string] {
     )
 
     if ($missing | is-not-empty) {
+        print $"  pkg: installing ($missing | length) missing: ($missing | str join ', ')"
         match $distro {
             "opensuse" => { sudo zypper --non-interactive install ...$missing }
             "fedora"   => { sudo dnf install -y --skip-unavailable --skip-broken ...$missing }
         }
+    } else {
+        print "  pkg: all packages already installed"
     }
 
     # Packages with a repo: filter to uninstalled, add repo + install individually
@@ -108,6 +115,7 @@ def install-pkg [distro: string] {
             }
         }
         | each {|p|
+            print $"  pkg (repo): installing ($p.name)..."
             try { sudo zypper addrepo --refresh $p.repo }
             sudo zypper refresh
             sudo zypper --non-interactive install $p.pkg
@@ -118,6 +126,7 @@ def install-cargo [] {
     $in
         | where {|p| which $p.bin | is-empty}
         | each {|p|
+            print $"  cargo: installing ($p.name)..."
             let args = match ("args" in $p) {
                 true => $p.args
                 _    => [$p.name]
@@ -129,20 +138,33 @@ def install-cargo [] {
 def install-uv [] {
     $in
         | where {|p| which $p.bin | is-empty}
-        | each {|p| ^uv tool install $p.name}
+        | each {|p|
+            print $"  uv: installing ($p.name)..."
+            ^uv tool install $p.name
+        }
 }
 
 def install-go [] {
     $in
         | where {|p| which $p.bin | is-empty}
-        | each {|p| ^go install ...$p.args}
+        | each {|p|
+            print $"  go: installing ($p.name)..."
+            ^go install ...$p.args
+        }
 }
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
+print "── pkg ──────────────────────────────────────────"
 $packages | where via == "pkg"   | install-pkg $distro
+
+print "── cargo ────────────────────────────────────────"
 $packages | where via == "cargo" | install-cargo
+
+print "── uv ───────────────────────────────────────────"
 $packages | where via == "uv"    | install-uv
+
+print "── go ───────────────────────────────────────────"
 $packages | where via == "go"    | install-go
 
-print "package install: done!"
+print "── done ─────────────────────────────────────────"
