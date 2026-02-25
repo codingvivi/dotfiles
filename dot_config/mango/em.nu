@@ -2,6 +2,10 @@ def main [] {
   help main
 }
 
+def "main org agenda" [] {
+  emacsclient -c -F '((name . "OrgAgendaFrame"))' -e '(progn (org-agenda))'
+}
+
 def "main org agenda list" [] {
   emacsclient -c -F '((name . "OrgAgendaFrame"))' -e '(progn (org-agenda-list) (delete-other-windows))'
 }
