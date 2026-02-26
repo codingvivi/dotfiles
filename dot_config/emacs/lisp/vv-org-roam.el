@@ -18,7 +18,7 @@
     '(("d" "default" entry
        "* %<%Y-%m-%d>\n%?"
        :target (file+head "%<%Y-%m-%d>.org"
-                          "#+title: %<%Y-%m-%d>\n#+filetags: :daily:\n"))))
+                          "#+title: %<%Y-%m-%d>\n"))))
 
   (add-hook 'org-roam-capture-new-node-hook #'org-id-get-create)
   (org-roam-db-autosync-mode))

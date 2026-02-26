@@ -8,7 +8,7 @@
       '(("p" "Personal"
          ((tags-todo "productivity")
           (tags-todo "neovim")
-          (tags-todo "musicwork")
+          (tags-todo "+musicwork-tracks")
           (tags-todo "-{.+}")) ; without tags
          ((org-agenda-sorting-strategy '(priority-down))))
 
