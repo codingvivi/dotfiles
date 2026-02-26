@@ -121,6 +121,9 @@ packages:
   - name: uv
     via: pkg
     check: which
+    opensuse:
+      pkg: python-uv
+      
 
   - name: go
     via: pkg
