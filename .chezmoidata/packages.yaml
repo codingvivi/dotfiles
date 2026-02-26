@@ -115,13 +115,6 @@ packages:
       repo: "https://download.opensuse.org/repositories/home:alternateved/openSUSE_Tumbleweed/home:alternateved.repo"
 
   # ── toolchains ────────────────────────────────────────────────────────────────
-  - name: uv
-    via: pkg
-    check: which
-    opensuse:
-      pkg: python-uv
-      
-
   - name: go
     via: pkg
     fedora:
