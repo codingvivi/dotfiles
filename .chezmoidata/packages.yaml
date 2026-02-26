@@ -25,13 +25,11 @@ packages:
   # ── shell ─────────────────────────────────────────────────────────────────────
   - name: nu
     fedora:
-      via: carg
+      via: cargo
   - fish
 
   # ── launcher ──────────────────────────────────────────────────────────────────
-  - name: rofi
-    opensuse:
-      install: exclusive
+  - rofi
 
   # ── file managers ─────────────────────────────────────────────────────────────
   - feh
@@ -65,9 +63,7 @@ packages:
 
   # ── music ─────────────────────────────────────────────────────────────────────
   - mpd
-  - name: beets
-    fedora:
-      install: exclusive
+  - beets
   - name: rmpc
     via: cargo
     args: ["--git", "https://github.com/mierak/rmpc"]

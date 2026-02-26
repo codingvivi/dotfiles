@@ -6,10 +6,10 @@
 
 (setq org-agenda-custom-commands
       '(("p" "Personal"
-         ((tags-todo "productivity")
+         ((tags-todo "-{.+}")
+          (tags-todo "productivity")
           (tags-todo "neovim")
-          (tags-todo "+musicwork-tracks")
-          (tags-todo "-{.+}")) ; without tags
+          (tags-todo "+musicwork-tracks")) ; without tags
          ((org-agenda-sorting-strategy '(priority-down))))
 
         ("c" "Chores"
