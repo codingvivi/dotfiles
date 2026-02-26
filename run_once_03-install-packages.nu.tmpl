@@ -98,7 +98,7 @@ def install-pkg [distro: string] {
     if ($missing | is-not-empty) {
         print $"  pkg: installing ($missing | length) missing: ($missing | str join ', ')"
         match $distro {
-            "opensuse" => { sudo zypper --non-interactive install ...$missing }
+            "opensuse" => { sudo zypper install ...$missing }
             "fedora"   => { sudo dnf install -y --skip-unavailable --skip-broken ...$missing }
         }
     } else {
