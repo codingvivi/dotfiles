@@ -48,7 +48,7 @@ packages:
     fedora:
       install: exclusive
 
-  # ── audio ─────────────────────────────────────────────────────────────────────
+  # ── audio ────────────────────────────────────────────────────────────────────
   - pipewire
   - pipewire-pulseaudio
   - wireplumber
@@ -97,8 +97,8 @@ packages:
       install: exclusive
 
   # ── comms ─────────────────────────────────────────────────────────────────────
-  - name: aparte
-    via: cargo
+  # - name: aparte
+  #   via: cargo
   - name: iamb
     via: cargo
     opensuse:
