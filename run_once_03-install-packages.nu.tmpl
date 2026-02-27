@@ -120,8 +120,8 @@ def install-pkg [distro: string] {
 def install-args [] {
     let p = $in
     match ($p | get -o args) {
-        true => $p.args
-        _    => [$p.name]
+        null => [$p.name]
+        _ => $p.args
     }
 }
 
