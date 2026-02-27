@@ -52,8 +52,8 @@ packages:
   - pipewire
   - pipewire-pulseaudio
   - wireplumber
-  - name: wiremix
-    via: cargo
+  # - name: wiremix
+    # via: cargo
 
   # ── music ─────────────────────────────────────────────────────────────────────
   - mpd
