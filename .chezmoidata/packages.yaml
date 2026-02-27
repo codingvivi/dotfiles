@@ -10,6 +10,7 @@ packages:
   - foot
   - atuin
   - zoxide
+  - fira-code-fonts
 
   # ── bar / notifications / idle ────────────────────────────────────────────────
   - name: waybar
@@ -125,3 +126,4 @@ packages:
   - name: pomo
     via: go
     args: ["codeberg.org/kevinschoon/pomo/cmd/pomo@latest"]
+

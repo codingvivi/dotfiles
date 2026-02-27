@@ -1,0 +1,14 @@
+#!/usr/bin/env nu
+
+let src = "{{ .chezmoi.sourceDir }}/files"
+
+# ── kanata ─────────────────────────────────────────────────────────────────────
+
+print "installing kanata.service..."
+sudo mkdir -p /etc/systemd/system
+sudo cp $"($src)/etc/systemd/system/kanata.service" /etc/systemd/system/kanata.service
+
+sudo systemctl daemon-reload
+#sudo systemctl enable --now kanata.service
+
+print "done"

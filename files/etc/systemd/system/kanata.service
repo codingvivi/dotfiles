@@ -1,0 +1,55 @@
+[Unit]
+Description=Kanata key remapper
+Documentation=https://github.com/jtroo/kanata
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/kanata --cfg /etc/kanata/config.kbd
+BindPaths=/home/musicvivireal/.config/kanata/config.kbd:/etc/kanata/config.kbd
+
+# id & perms
+User=kanata-user
+Group=kanata-user
+SupplementaryGroups=input uinput
+
+# performance
+Nice=-20
+OOMScoreAdjust=-1000
+
+#folder sandboxing
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateUsers=yes
+ReadOnlyPaths=/etc/kanata/
+
+# device sandboxing
+PrivateDevices=no
+DevicePolicy=closed
+DeviceAllow=/dev/uinput rw
+DeviceAllow=char-input r
+
+# hardening
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+NoNewPrivileges=yes
+MemoryDenyWriteExecute=yes
+
+# network and syscalls
+RestrictAddressFamilies=none
+SystemCallFilter=@system-service
+SystemCallFilter=ioprio_set
+SystemCallErrorNumber=EPERM
+
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
