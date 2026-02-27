@@ -1,8 +1,0 @@
-#!/usr/bin/env nu
-
-if (which uv | is-empty) {
-    print "installing uv..."
-    ^curl -LsSf https://astral.sh/uv/install.sh | ^sh
-} else {
-    print "uv already installed, skipping"
-}

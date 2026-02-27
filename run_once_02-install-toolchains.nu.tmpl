@@ -1,0 +1,15 @@
+#!/usr/bin/env nu
+
+if (which rustup | is-empty) {
+    print "installing rust..."
+    ^curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | ^sh -s -- -y
+} else {
+    print "rust already installed, skipping"
+}
+
+if (which uv | is-empty) {
+    print "installing uv..."
+    ^curl -LsSf https://astral.sh/uv/install.sh | ^sh
+} else {
+    print "uv already installed, skipping"
+}
