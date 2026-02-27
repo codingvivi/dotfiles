@@ -13,3 +13,10 @@ if (which uv | is-empty) {
 } else {
     print "uv already installed, skipping"
 }
+
+if (which mise | is-empty) {
+    print "installing mise..."
+    ^curl https://mise.run | ^sh
+} else {
+    print "mise already installed, skipping"
+}

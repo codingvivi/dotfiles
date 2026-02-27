@@ -135,6 +135,7 @@ def install-tool [via: string] {
                 "cargo" => { ^cargo install ...$args }
                 "uv"    => { ^uv tool install ...$args }
                 "go"    => { ^go install ...$args }
+                "mise"  => { ^mise use -g ...$args }
             }
         }
 }
@@ -152,5 +153,8 @@ $packages | where via == "uv"    | install-tool "uv"
 
 print "── go ───────────────────────────────────────────"
 $packages | where via == "go"    | install-tool "go"
+
+print "── mise ─────────────────────────────────────────"
+$packages | where via == "mise"  | install-tool "mise"
 
 print "── done ─────────────────────────────────────────"

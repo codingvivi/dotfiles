@@ -121,8 +121,8 @@ packages:
     via: cargo
   # ── dev tools ─────────────────────────────────────────────────────────────────
   - name: ghq
-    via: go
-    args: ["github.com/x-motemen/ghq@latest"]
+    via: mise
+    args: ["ghq@latest"]
 
   - name: pomo
     via: go
