@@ -89,7 +89,7 @@ packages:
   - name: swaylock-effects
     opensuse:
       install: exclusive
-      repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/openSUSE_Tumbleweed/home:mantarimay:sway.repo"
+      repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/standard/home:mantarimay:sway.repo"
 
   # ── bluetooth ─────────────────────────────────────────────────────────────────
   - name: bluez
