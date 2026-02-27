@@ -44,9 +44,6 @@ packages:
   - name: zathura-plugin-pdf-mupdf
     opensuse:
       install: exclusive
-  - name: zathura-plugin-pdf-poppler
-    opensuse:
-      install: exclusive
   - name: zathura-plugins-all
     fedora:
       install: exclusive
@@ -83,10 +80,10 @@ packages:
       install: exclusive
 
   # ── compositor ────────────────────────────────────────────────────────────────
-  - name: mangowc
+  - name: mangowc-git
     opensuse:
       install: exclusive
-      repo: "https://download.opensuse.org/repositories/home:kaiman/openSUSE_Tumbleweed/home:kaiman.repo"
+      repo: "https://download.opensuse.org/repositories/home:darix:playground/openSUSE_Tumbleweed/home:darix:playground.repo"
 
   # ── lock screen ───────────────────────────────────────────────────────────────
   - name: swaylock-effects
