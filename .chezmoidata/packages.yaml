@@ -19,8 +19,8 @@ packages:
   # ── clipboard ─────────────────────────────────────────────────────────────────
   - cliphist
   - wl-clipboard
-  - name: wl-clip-persist
-    via: cargo
+  # - name: wl-clip-persist
+  #   via: cargo
 
   # ── shell ─────────────────────────────────────────────────────────────────────
   - fish
