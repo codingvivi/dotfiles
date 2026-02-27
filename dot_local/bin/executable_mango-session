@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# 1. Reset failed units so we start with a clean slate
+systemctl --user reset-failed
+
+# 2. Import the environment. 
+# Using 'import-environment' without args is deprecated in new systemd, 
+# so we explicitly send the most important variables for Asahi/Wayland.
+#systemctl --user import-environment PATH DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+
+# 3. Update D-Bus so apps don't hang on startup
+dbus-update-activation-environment --systemd --all
+#if hash dbus-update-activation-environment 2>/dev/null ; then
+#    dbus-update-activation-environment --systemd --all
+#fi
+
+# 4. Start mangowc and wait for it to exit
+systemctl --user --wait start mangowc.service
+
+# 5. Clean up when Mango closes
+systemctl --user stop graphical-session.target
+# systemctl --user unset-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP

@@ -8,6 +8,8 @@ packages:
 
   # ── terminal ──────────────────────────────────────────────────────────────────
   - foot
+  - atuin
+  - zoxide
 
   # ── bar / notifications / idle ────────────────────────────────────────────────
   - name: waybar
@@ -112,10 +114,6 @@ packages:
       repo: "https://download.opensuse.org/repositories/home:alternateved/openSUSE_Tumbleweed/home:alternateved.repo"
 
   # ── toolchains ────────────────────────────────────────────────────────────────
-  - name: go
-    via: pkg
-    fedora:
-      pkg: golang
 
   - name: cargo-update
     via: cargo
