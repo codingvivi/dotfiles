@@ -12,13 +12,14 @@ sudo systemctl daemon-reload
 
 # ── kanata user / system setup ──────────────────────────────────────────────
 
+# ensure uinput group exists (may not be present by default)
+if (^getent group uinput | complete).exit_code != 0 {
+    sudo groupadd uinput
+} else { print "ugroup exists, skipping creation"}
+
 if (^id kanata-user | complete).exit_code != 0 {
     print "setting up kanata user..."
 
-    # ensure uinput group exists (may not be present by default)
-    if (^getent group uinput | complete).exit_code != 0 {
-        sudo groupadd uinput
-    }
 
     # dedicated system user with no login shell
     sudo useradd -r -s /sbin/nologin kanata-user
@@ -34,8 +35,6 @@ if (^id kanata-user | complete).exit_code != 0 {
     sudo udevadm trigger
 
     sudo systemctl enable --now kanata.service
-} else {
-    print "kanata-user already exists, skipping user setup"
-}
+} else { print "kanata-user already exists, skipping user setup" }
 
 print "done"
