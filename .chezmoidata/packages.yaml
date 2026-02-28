@@ -1,3 +1,29 @@
+# Package list consumed by run_once_03-install-packages.nu.tmpl
+#
+# SYNTAX
+# ──────
+# Plain string → install via system pkg manager, checked with `rpm -q <name>`, on all distros:
+#   - somepackage
+#
+# Named record (any fields below are optional):
+#   - name: somepackage       # package name (required)
+#     via: pkg                # installer: pkg | cargo | uv | go | mise  (default: pkg)
+#     check: somebinary       # override the binary/pkg used to check if already installed
+#     pkg: other-pkg-name     # override the package name passed to the installer
+#     bin: somebinary         # alias for check
+#     args: [...]             # extra args passed to the installer command
+#     repo: "https://..."     # add this repo before installing (zypper/dnf)
+#
+# Distro overrides — add an `opensuse:` or `fedora:` block to merge/override top-level fields:
+#   - name: somepackage
+#     via: cargo
+#     opensuse:
+#       via: pkg              # use pkg on opensuse, cargo on everything else
+#
+# Special values for `install:` inside a distro block:
+#   install: exclusive        # only install on distros that also have install: exclusive
+#   install: ignore           # skip on this distro
+#
 packages:
   # ── brightness ────────────────────────────────────────────────────────────────
   - brightnessctl
@@ -11,6 +37,9 @@ packages:
   - atuin
   - zoxide
   - fira-code-fonts
+  - name: tlrc
+    bin: tldr
+    
 
   # ── bar / notifications / idle ────────────────────────────────────────────────
   - name: waybar

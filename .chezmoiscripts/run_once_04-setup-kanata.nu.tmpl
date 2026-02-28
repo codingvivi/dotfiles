@@ -1,0 +1,36 @@
+#!/usr/bin/env nu
+
+let src = "{{ .chezmoi.sourceDir }}/files"
+
+# ── kanata ─────────────────────────────────────────────────────────────────────
+
+print "installing kanata.service..."
+sudo mkdir -p /etc/systemd/system
+sudo cp $"($src)/etc/systemd/system/kanata.service" /etc/systemd/system/kanata.service
+
+sudo systemctl daemon-reload
+
+# ── kanata user / system setup ──────────────────────────────────────────────
+
+if (^id kanata-user | complete).exit_code != 0 {
+    print "setting up kanata user..."
+
+    # dedicated system user with no login shell
+    sudo useradd -r -s /sbin/nologin kanata-user
+    sudo usermod -aG input,uinput kanata-user
+
+    # load uinput now and persist across reboots
+    "uinput" | sudo tee /etc/modules-load.d/uinput.conf
+    sudo modprobe uinput
+
+    # allow uinput group to access /dev/uinput
+    'KERNEL=="uinput", GROUP="uinput", MODE="0660"' | sudo tee /etc/udev/rules.d/99-uinput.rules
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
+
+    sudo systemctl enable --now kanata.service
+} else {
+    print "kanata-user already exists, skipping user setup"
+}
+
+print "done"
