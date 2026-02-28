@@ -139,9 +139,6 @@ packages:
   # ── keyboard ──────────────────────────────────────────────────────────────────
   - name: kanata
     via: cargo
-    opensuse:
-      via: pkg
-      repo: "https://download.opensuse.org/repositories/home:alternateved/openSUSE_Tumbleweed/home:alternateved.repo"
 
   # ── toolchains ────────────────────────────────────────────────────────────────
 
