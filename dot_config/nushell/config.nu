@@ -22,6 +22,7 @@ use std/util "path add"
 path add ($env.GO_HOME | path join "bin")
 path add ($env.HOMEBREW_PREFIX | path join "bin")
 path add ($env.HOMEBREW_PREFIX | path join "sbin")
+
 #$env.MANPATH = ($env.MANPATH? | default [] | append '/home/linuxbrew/.linuxbrew/share/man' | uniq)
 #$env.INFOPATH = ($env.INFOPATH? | default [] | append '/home/linuxbrew/.linuxbrew/share/info' | uniq)
 # 
@@ -33,7 +34,6 @@ def --wrapped  dotfiles [...rest] {
 }
 
 $env.CHEZMOI_HOME = ($env.XDG_DATA_HOME | path join 'chezmoi')
-alias chezmoi-cd = cd $env.CHEZMOI_HOME
 
 alias fzfgo = cd (fzf)
 alias fzfcb =  wl-copy (fzf)
@@ -74,4 +74,4 @@ $env.local-autoload-dir = ($nu.data-dir | path join "vendor/autoload")
 #source activate.nu
 source appearance.nu
 
-use ($env.HOME | path join '.config/broot/launcher/nushell/br') *
+#use ($env.HOME | path join '.config/broot/launcher/nushell/br') *
