@@ -1,12 +1,20 @@
 #!/usr/bin/env nu
 
-let src = "{{ .chezmoi.sourceDir }}/files"
-
 # ── kanata ─────────────────────────────────────────────────────────────────────
 
 print "installing kanata.service..."
 sudo mkdir -p /etc/systemd/system
-sudo cp $"($src)/etc/systemd/system/kanata.service" /etc/systemd/system/kanata.service
+chezmoi execute-template (open $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service") | sudo tee /etc/systemd/system/kanata.service | ignore
+
+{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
+# symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
+let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
+if ($cargo_bin | path exists) {
+    sudo ln -sf $cargo_bin /usr/local/bin/kanata
+} else {
+    print "warning: kanata not found in ~/.cargo/bin, skipping symlink"
+}
+{{ end -}}
 
 sudo systemctl daemon-reload
 

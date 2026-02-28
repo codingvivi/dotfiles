@@ -5,7 +5,7 @@ After=local-fs.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/kanata --cfg /etc/kanata/config.kbd
+ExecStart={{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" }}/usr/local/bin{{ else }}/usr/bin{{ end }}/kanata --cfg /etc/kanata/config.kbd
 BindPaths=/home/musicvivireal/.config/kanata/config.kbd:/etc/kanata/config.kbd
 
 # id & perms
