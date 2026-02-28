@@ -15,6 +15,11 @@ sudo systemctl daemon-reload
 if (^id kanata-user | complete).exit_code != 0 {
     print "setting up kanata user..."
 
+    # ensure uinput group exists (may not be present by default)
+    if (^getent group uinput | complete).exit_code != 0 {
+        sudo groupadd uinput
+    }
+
     # dedicated system user with no login shell
     sudo useradd -r -s /sbin/nologin kanata-user
     sudo usermod -aG input,uinput kanata-user
