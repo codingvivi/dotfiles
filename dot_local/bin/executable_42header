@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# header_formatter.sh
+#
+# A script to add or update a 42-style header, designed to be used as a
+# formatter in an editor like Helix.
+#
+# This version acts as a true filter:
+# - It reads the file's content from STANDARD INPUT.
+# - It uses the filename (passed as the first argument) for metadata only.
+# - It writes the complete, modified content to STANDARD OUTPUT.
+#
+# Helix Integration:
+# Add the following to your `~/.config/helix/languages.toml` under the
+# appropriate language section (e.g., [[language]] name = "c").
+#
+# formatter = { command = "header_formatter.sh", args = ["%{buffer_name}"] }
+#
+# ==============================================================================
+
+# --- Metadata and Configuration ---
+
+# We still need the filename argument for the header text and filetype detection.
+# Exit if it's not provided.
+if [[ -z "$1" ]]; then
+    echo "Error: Filename argument is required." >&2
+    exit 1
+fi
+FILENAME="${1##*/}"
+
+# Read the ENTIRE file content from standard input into a variable.
+# This is the most crucial step.
+CONTENT=$(cat)
+
+# ASCII art for the header
+declare -a ASCII_ART=(
+    "        :::      ::::::::"
+    "      :+:      :+:    :+:"
+    "    +:+ +:+         +:+  "
+    "  +#+  +:+       +#+     "
+    "+#+#+#+#+#+   +#+        "
+    "     #+#    #+#          "
+    "    ###   ########.fr    "
+)
+
+# Default values
+LENGTH=80
+MARGIN=5
+START_CHAR="/*"
+END_CHAR="*/"
+FILL_CHAR="*"
+
+# File type associations
+declare -A FILE_TYPES=(
+    ["c"]="/* */ *" ["h"]="/* */ *" ["cc"]="/* */ *" ["hh"]="/* */ *"
+    ["cpp"]="/* */ *" ["hpp"]="/* */ *" ["tpp"]="/* */ *" ["ipp"]="/* */ *"
+    ["cxx"]="/* */ *" ["go"]="/* */ *" ["rs"]="/* */ *" ["php"]="/* */ *"
+    ["java"]="/* */ *" ["kt"]="/* */ *" ["kts"]="/* */ *" ["htm"]="<!-- --> *"
+    ["html"]="<!-- --> *" ["xml"]="<!-- --> *" ["js"]="// // *" ["ts"]="// // *"
+    ["tex"]="% % *" ["ml"]="(* *) *" ["mli"]="(* *) *" ["mll"]="(* *) *"
+    ["mly"]="(* *) *" ["vim"]="\" \" *" ["el"]="; ; *" ["asm"]="; ; *"
+    ["f90"]="! ! /" ["f95"]="! ! /" ["f03"]="! ! /" ["f"]="! ! /"
+    ["for"]="! ! /" ["lua"]="-- -- -" ["py"]="# # *" ["sh"]="# # *"
+    ["bash"]="# # *"
+)
+
+# --- Functions ---
+
+get_extension() {
+    echo "${FILENAME##*.}"
+}
+
+set_comment_chars() {
+    local ext="$1"
+    if [[ -n "${FILE_TYPES[$ext]}" ]]; then
+        local chars="${FILE_TYPES[$ext]}"
+        START_CHAR=$(echo "$chars" | cut -d' ' -f1)
+        END_CHAR=$(echo "$chars" | cut -d' ' -f2)
+        FILL_CHAR=$(echo "$chars" | cut -d' ' -f3)
+    fi
+}
+
+get_ascii_line() {
+    local line_num=$1
+    if [[ $line_num -ge 3 && $line_num -le 9 ]]; then
+        echo "${ASCII_ART[$((line_num - 3))]}"
+    else
+        echo ""
+    fi
+}
+
+create_text_line() {
+    local left_text="$1"
+    local right_text="$2"
+    local max_left_length=$((LENGTH - MARGIN * 2 - ${#right_text}))
+    if [[ ${#left_text} -gt $max_left_length ]]; then
+        left_text="${left_text:0:$max_left_length}"
+    fi
+    local spaces_needed=$((LENGTH - MARGIN * 2 - ${#left_text} - ${#right_text}))
+    [[ $spaces_needed -lt 0 ]] && spaces_needed=0
+    local line="$START_CHAR"
+    line+=$(printf "%*s" $((MARGIN - ${#START_CHAR})) "")
+    line+="$left_text"
+    line+=$(printf "%*s" $spaces_needed "")
+    line+="$right_text"
+    line+=$(printf "%*s" $((MARGIN - ${#END_CHAR})) "")
+    line+="$END_CHAR"
+    echo "$line"
+}
+
+create_header_line() {
+    local line_num=$1
+    local created_date="$2"
+    local user="lrain"
+    local mail="lrain@students.42berlin.de"
+    case $line_num in
+        1|11)
+            local fill_length=$((LENGTH - ${#START_CHAR} - ${#END_CHAR} - 2))
+            echo "$START_CHAR $(printf "%*s" $fill_length "" | tr ' ' "$FILL_CHAR") $END_CHAR"
+            ;;
+        2|10) create_text_line "" "" ;;
+        3|5|7) create_text_line "" "$(get_ascii_line $line_num)" ;;
+        4) create_text_line "$FILENAME" "$(get_ascii_line $line_num)" ;;
+        6) create_text_line "By: $user <$mail>" "$(get_ascii_line $line_num)" ;;
+        8)
+            local date="${created_date:-$(date '+%Y/%m/%d %H:%M:%S')}"
+            create_text_line "Created: $date by $user" "$(get_ascii_line $line_num)"
+            ;;
+        9)
+            local date=$(date "+%Y/%m/%d %H:%M:%S")
+            create_text_line "Updated: $date by $user" "$(get_ascii_line $line_num)"
+            ;;
+    esac
+}
+
+generate_header() {
+    local created_date="$1"
+    local ext=$(get_extension)
+    set_comment_chars "$ext"
+    for i in {1..11}; do
+        create_header_line $i "$created_date"
+    done
+}
+
+# --- Main Logic ---
+
+# Check if the content (from stdin) already has a header.
+# We pipe the content variable to the tools instead of reading a file.
+if echo "$CONTENT" | head -n 11 | grep -q "Created:\|Updated:\|By:\|::::\|+#+\|###"; then
+    # Header exists: extract original creation date and update.
+    created_date=$(echo "$CONTENT" | head -n 11 | grep "Created:" | sed -n 's/.*Created: \([0-9/: ]*\) by.*/\1/p')
+    generate_header "$created_date"
+
+    # Find where the actual content starts and print it.
+    # We pipe the content variable to the tools instead of reading a file.
+    content_without_header=$(echo "$CONTENT" | tail -n +12)
+    if [[ -n "$content_without_header" ]]; then
+        echo
+        echo "$content_without_header"
+    fi
+else
+    # Header does not exist: add a new one.
+    generate_header ""
+    
+    # Print the original content after the header.
+    if [[ -n "$CONTENT" ]]; then
+        echo
+        echo "$CONTENT"
+    fi
+fi

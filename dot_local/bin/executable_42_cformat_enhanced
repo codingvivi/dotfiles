@@ -1,0 +1,19 @@
+#!/usr/bin/env -S nu --stdin
+def --wrapped main [
+  file_name:path
+  project_root: path
+  ...args
+] {
+
+ let content = $in
+ let curr_path = ($file_name | path expand )
+ let allowed = (fd ...$args -e c -e h | lines | path expand ) 
+
+  let output = (
+    match ($file_name in $allowed) {
+      true => ($content | c_formatter_42)
+      false => $content
+    }
+  )
+  print $output
+}
