@@ -1,0 +1,38 @@
+#!/usr/bin/env nu
+def main [] {
+    print "please provide at least one commmand! Or get help with --help"
+}
+
+# go to next wallpaper
+export def "main next" [] {
+    let wp_dir = $"($env.HOME)/Pictures/Wallpapers/master" 
+    let state_file = $"($env.HOME)/.cache/wallpaper_playlist_index.txt"
+    
+    # 1. Get files sorted by name (respecting your numeric prefixes)
+    
+
+    let files = (glob $"($wp_dir)/**/*" 
+                | where ($it | path type) == "file" 
+                | sort -n)   
+
+    let count = ($files | length)
+
+    if $count == 0 { return "No wallpapers found" }
+
+
+    # if path exists otherwise init -1 which turns to 0
+    let last_idx = if ($state_file | path exists) { 
+        open $state_file | into int 
+    } else { 
+        -1 
+    }
+
+    #mod will return 0 once max index reached
+    let next_idx = (($last_idx + 1) mod $count)
+
+    let wallpaper = ($files | get $next_idx)
+
+    ^awww img $wallpaper --transition-type any --transition-fps 60
+    
+    $next_idx | save -f $state_file
+}
