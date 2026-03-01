@@ -45,7 +45,6 @@ if (^id kanata-user | complete).exit_code != 0 {
     sudo udevadm trigger
 
     sudo systemctl daemon-reload
-    sudo systemctl enable --now kanata.service
 } else { print "kanata-user already exists, skipping user setup" }
 
 print "done"

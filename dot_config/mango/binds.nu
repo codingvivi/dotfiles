@@ -14,6 +14,11 @@ def "main mode switch" [mode:string] {
   }
 }
 
+def "main dispatch-and-switch" [cmd:string, mode:string] {
+  mmsg -d $cmd
+  main mode switch $mode
+}
+
 # def "main focus-or-open" [] {
 #   
 # }
