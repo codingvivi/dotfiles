@@ -1,9 +1,11 @@
+#!/usr/bin/env -S nu --no-std-lib
+
 def main [] {
-  help binds   
+  help binds
 }
 
 def "main mode switch" [mode:string] {
-  let lastmode = (mmsg -b | split words | last) 
+  let lastmode = (mmsg -b | split words | last)
   mmsg -d $"setkeymode,($mode)"
   notify-send -c "wm-mode" -t 700 $mode -h string:x-canonical-private-synchronous:wm-mode
   match [$lastmode $mode] {
@@ -20,5 +22,5 @@ def "main dispatch-and-switch" [cmd:string, mode:string] {
 }
 
 # def "main focus-or-open" [] {
-#   
+#
 # }
