@@ -29,6 +29,12 @@ path add ($env.HOMEBREW_PREFIX | path join "sbin")
 #path add ($env.)
 
 $env.DOTFILE_REPO = ($env.HOME | path join '.dotfile-repo')
+
+def --wrapped osync [...options] {
+	bash osync.sh ...$options
+}
+
+
 def --wrapped  dotfiles [...rest] {
     git --git-dir=($env.DOTFILE_REPO) --work-tree=($env.HOME) ...$rest
 }

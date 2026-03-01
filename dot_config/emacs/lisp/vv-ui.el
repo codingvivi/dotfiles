@@ -2,6 +2,10 @@
 
 (when (fboundp 'which-key-mode) (which-key-mode))
 
+(add-to-list 'custom-theme-load-path
+             (expand-file-name "lisp/themes" user-emacs-directory))
+(load-theme 'oxocarbon t)
+
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)

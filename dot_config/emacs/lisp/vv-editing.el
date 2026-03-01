@@ -1,12 +1,5 @@
 ;;; vv-editing.el --- Theme and modal editing
 
-(use-package autothemer)
-
-(use-package oxocarbon-theme
-  :vc (:url "https://github.com/konrad1977/oxocarbon-emacs"
-       :rev :newest)
-  :config (load-theme 'oxocarbon t))
-
 
 ; (use-package meow
 ;    :config
