@@ -2,9 +2,6 @@
 
 # ── kanata ─────────────────────────────────────────────────────────────────────
 
-print "installing kanata.service..."
-sudo mkdir -p /etc/systemd/system
-chezmoi execute-template (open $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service") | sudo tee /etc/systemd/system/kanata.service | ignore
 
 {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 # symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
@@ -26,6 +23,11 @@ if (^getent group uinput | complete).exit_code != 0 {
 } else { print "ugroup exists, skipping creation"}
 
 if (^id kanata-user | complete).exit_code != 0 {
+
+    print "installing kanata.service..."
+    sudo mkdir -p /etc/systemd/system
+    chezmoi execute-template (open $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service") | sudo tee /etc/systemd/system/kanata.service | ignore
+
     print "setting up kanata user..."
 
 
