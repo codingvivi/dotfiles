@@ -1,4 +1,4 @@
-;;; vv-org-agenda.el --- Org agenda configuration
+provide 'vv-org-agenda)
 
 (setq org-agenda-skip-scheduled-if-done t)
 (setq org-agenda-skip-deadline-if-done t)
@@ -6,9 +6,7 @@
 
 (setq org-agenda-custom-commands
       '(("p" "Personal"
-         ((tags-todo "-{.+}")
-          (tags-todo "productivity")
-          (tags-todo "neovim")
+         ((tags-todo "productivity")
           (tags-todo "+musicwork-tracks")) ; without tags
          ((org-agenda-sorting-strategy '(priority-down))))
 
@@ -19,12 +17,14 @@
 
         ("r" "r&r"
          ((tags-todo "rnr|fun")
+          (tags-todo "+larporator+research")
           (tags-todo "+rnr+ricefields"))
          ((org-agenda-sorting-strategy '(priority-down))))
 
-        ("i" "r&r"
-         ((tags-todo "rnr|fun")
-          (tags-todo "+rnr+ricefields"))
+        ("i" "inbox"
+         ((tags-todo "-{.+}")
+          (tags-todo "-musicwork-rnr")
+          (tags-todo "+ricefields-rnr-chores"))
          ((org-agenda-sorting-strategy '(priority-down))))
 
         ("t" "Tracks"

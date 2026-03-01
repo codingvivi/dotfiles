@@ -6,14 +6,14 @@
 {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 # symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
 let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
-if ($cargo_bin | path exists) {
-    sudo ln -sf $cargo_bin /usr/local/bin/kanata
-} else {
-    print "warning: kanata not found in ~/.cargo/bin, skipping symlink"
+
+match [($cargo_bin | path exists) (/usr/local/bin/kanata | path exists)] {
+    [true false] => {sudo ln -sf $cargo_bin /usr/local/bin/kanata}
+    _ => { print "warning: kanata not found in ~/.cargo/bin, skipping symlink"}
 }
+
 {{ end -}}
 
-sudo systemctl daemon-reload
 
 # ── kanata user / system setup ──────────────────────────────────────────────
 
@@ -44,6 +44,7 @@ if (^id kanata-user | complete).exit_code != 0 {
     sudo udevadm control --reload-rules
     sudo udevadm trigger
 
+    sudo systemctl daemon-reload
     sudo systemctl enable --now kanata.service
 } else { print "kanata-user already exists, skipping user setup" }
 

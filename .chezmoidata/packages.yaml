@@ -39,6 +39,8 @@ packages:
   - fira-code-fonts
   - name: tlrc
     bin: tldr
+    fedora:
+        check: which
     
 
   # ── bar / notifications / idle ────────────────────────────────────────────────
