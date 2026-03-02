@@ -30,7 +30,7 @@ if (^id kanata-user | complete).exit_code != 0 {
 
     print "installing kanata.service..."
     sudo mkdir -p /etc/systemd/system
-    chezmoi execute-template (open $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service") | sudo tee /etc/systemd/system/kanata.service | ignore
+    chezmoi execute-template $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service" | sudo tee /etc/systemd/system/kanata.service | ignore
 
     print "setting up kanata user..."
 

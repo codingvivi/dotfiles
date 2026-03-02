@@ -10,6 +10,12 @@
 
         ("c" "Chores"
          ((tags-todo "domestic")
+          (tags-todo "+chores+ricefields")
+          (tags-todo "+shopping+online"))
+         ((org-agenda-sorting-strategy '(priority-down))))
+
+        ("e" "Errands"
+         ((tags-todo "+shopping+city")
           (tags-todo "+chores+ricefields"))
          ((org-agenda-sorting-strategy '(priority-down))))
 
