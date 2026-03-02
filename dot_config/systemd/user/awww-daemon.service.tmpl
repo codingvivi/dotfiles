@@ -6,7 +6,7 @@ Requisite=graphical-session.target
 [Service]
 # Using xrgb format often fixes "slanted" or artifacting images on Asahi/M1/M2 chips
 #ExecStart=%h/.local/bin/awww-daemon --format xrgb
-ExecStart=%h/.local/bin/awww-daemon
+ExecStart={{ if hasPrefix "opensuse" .chezmoi.osRelease.id }}/usr/bin/swww-daemon{{ else }}%h/.local/bin/awww-daemon{{ end }}
 Restart=on-failure
 RestartSec=5
 

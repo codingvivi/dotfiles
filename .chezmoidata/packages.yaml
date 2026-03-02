@@ -48,6 +48,8 @@ packages:
     fedora:
       install: ignore
   - mako
+  - name: libnotify
+    check: notify-send
   - hypridle
 
   # ── clipboard ─────────────────────────────────────────────────────────────────

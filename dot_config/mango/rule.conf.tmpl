@@ -1,4 +1,4 @@
-monitorrule=name:eDP-1,width:3456,height:2234,refresh:60,x:0,y:10,scale:1.4
+monitorrule=name:eDP-1,width:3456,height:2234,refresh:{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" }}120{{ else }}60{{ end }},x:0,y:10,scale:1.4
 #monitorrule=eDP-1,0.55,1,scroller,0,1.4,0,0,3456,2234,60
 #monitorrule=HDMI-A-1,0.55,1,scroller,0,1.0,0,0,3840,2160,60
 

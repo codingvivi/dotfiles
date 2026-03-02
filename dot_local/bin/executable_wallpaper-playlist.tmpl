@@ -5,13 +5,16 @@ def main [] {
 
 # go to next wallpaper
 export def "main next" [] {
-    let wp_dir = $"($env.HOME)/Pictures/Wallpapers/master" 
-    let state_file = $"($env.HOME)/.cache/wallpaper_playlist_index.txt"
-    
-    # 1. Get files sorted by name (respecting your numeric prefixes)
-    
+    let wp_dir =  ($env.HOME | path join Pictures/Wallpapers/rotation/master)
+    let state_file = ($env.HOME | path join .cache/wallpaper_playlist_index.txt)
 
-    let files = (glob $"($wp_dir)/**/*" 
+    # if ($state_file | path exists | $in == false) {
+    #     touch $state_file
+    # }
+    
+    #Get files sorted by name 
+
+    let files = (glob $"($wp_dir)/**/*" --exclude ["**/.stfolder", "**/.stfolder/**"]
                 | where ($it | path type) == "file" 
                 | sort -n)   
 
@@ -32,7 +35,7 @@ export def "main next" [] {
 
     let wallpaper = ($files | get $next_idx)
 
-    ^awww img $wallpaper --transition-type any --transition-fps 60
+    ^{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}swww{{ else }}awww{{ end }} img $wallpaper --transition-type any --transition-fps 60
     
     $next_idx | save -f $state_file
 }

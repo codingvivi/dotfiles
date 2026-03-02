@@ -7,9 +7,13 @@
 # symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
 let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
 
-match [($cargo_bin | path exists) ("/usr/local/bin/kanata" | path exists)] {
+match [($cargo_bin | path exists) (/usr/local/bin/kanata | path exists)] {
     [true false] => {sudo ln -sf $cargo_bin /usr/local/bin/kanata}
     _ => { print "warning: kanata not found in ~/.cargo/bin, skipping symlink"}
+match [($cargo_bin | path exists) ("/usr/local/bin/kanata"| path exists)] {
+    [true false] => {sudo cp $cargo_bin /usr/local/bin/kanata}
+    [false false] => { print "warning: kanata not found in ~/.cargo/bin, skipping symlink"}
+    [false true] => { print "cargo already copied to correct directory, skipping"}
 }
 
 {{ end -}}
