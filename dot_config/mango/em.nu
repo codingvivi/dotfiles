@@ -2,6 +2,10 @@ def main [] {
   help main
 }
 
+def "main emacs scratch" [] {
+  emacsclient -c -e '(switch-to-buffer "*scratch*")'
+}
+
 def "main org agenda" [] {
   emacsclient -c -F '((name . "OrgAgendaFrame"))' -e '(progn (org-agenda))'
 }

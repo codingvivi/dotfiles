@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "determining distro..."
+
 {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 command -v nu &>/dev/null || sudo zypper --non-interactive install nushell
 {{ else if eq .chezmoi.osRelease.id "fedora" "fedora-asahi-remix" -}}
@@ -9,3 +11,7 @@ command -v nu &>/dev/null || sudo dnf install --assumeyes nushell
 echo "Unsupported distro: {{ .chezmoi.osRelease.id }}" >&2
 exit 1
 {{ end -}}
+
+
+echo "detected distro: {{ .chezmoi.osRelease.id }}"
+

@@ -88,8 +88,13 @@ packages:
   - pipewire
   - pipewire-pulseaudio
   - wireplumber
-  # - name: wiremix
-    # via: cargo
+  - name: pipewire-devel
+    opensuse:
+      install: exclusive
+  - name: wiremix
+    via: cargo
+    fedora:
+      via: pkg
 
   # ── music ─────────────────────────────────────────────────────────────────────
   - mpd
@@ -97,7 +102,9 @@ packages:
   - name: rmpc
     via: cargo
     args: ["--git", "https://github.com/mierak/rmpc"]
-
+  # ── media ─────────────────────────────────────────────────────────────────────
+  - yt-dlp
+  - mpv
   # ── email ─────────────────────────────────────────────────────────────────────
   - gpgme-devel
   - isync

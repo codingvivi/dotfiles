@@ -2,7 +2,7 @@
 #![enable(unwrap_newtypes)]
 #![enable(unwrap_variant_newtypes)]
 (
-    address: "~/.local/state/mpd/socket",
+    address: "/run/user/1000/mpd/socket",
     password: None,
     cache_dir: "~/.cache/rmpc",
     on_song_change: None,

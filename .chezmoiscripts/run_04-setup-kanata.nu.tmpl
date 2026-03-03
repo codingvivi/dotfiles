@@ -1,23 +1,26 @@
 #!/usr/bin/env nu
 
-# ── kanata ─────────────────────────────────────────────────────────────────────
+print "setting up kanata..."
 
+# ── kanata ─────────────────────────────────────────────────────────────────────
 
 {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 # symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
 let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
 
-match [($cargo_bin | path exists) (/usr/local/bin/kanata | path exists)] {
-    [true false] => {sudo ln -sf $cargo_bin /usr/local/bin/kanata}
-    _ => { print "warning: kanata not found in ~/.cargo/bin, skipping symlink"}
-match [($cargo_bin | path exists) ("/usr/local/bin/kanata"| path exists)] {
-    [true false] => {sudo cp $cargo_bin /usr/local/bin/kanata}
-    [false false] => { print "warning: kanata not found in ~/.cargo/bin, skipping symlink"}
-    [false true] => { print "cargo already copied to correct directory, skipping"}
+
+print "assuring kanata binary accessible to system..."
+
+match [($cargo_bin | path exists) ("/usr/local/bin/kanata" | path exists)] {
+    [true false] => { sudo cp -v $cargo_bin /usr/local/bin/kanata;}
+    [false false] => { print "warning: kanata not found in ~/.cargo/bin, skipping" }
+    [false true] => { print "cargo kanata already copied, skipping" }
+    _ => {}
 }
 
 {{ end -}}
 
+print "kanata binary is where it should be!"
 
 # ── kanata user / system setup ──────────────────────────────────────────────
 
@@ -51,4 +54,4 @@ if (^id kanata-user | complete).exit_code != 0 {
     sudo systemctl daemon-reload
 } else { print "kanata-user already exists, skipping user setup" }
 
-print "done"
+print "kanata set up!"
