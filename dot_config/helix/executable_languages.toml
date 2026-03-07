@@ -196,6 +196,11 @@ name = "ini"
 file-types = ["ini", "conf", { glob = "mako/config"}]
 
 [[language]]
+name = "markdown"
+formatter = { command = "flowmark", args = ["--semantic", "--smartquotes", "--ellipses", "--width", "0", "-"] }
+auto-format = true
+
+[[language]]
 name = "d2"
 scope = "source.git"
 file-types = ["d2"]

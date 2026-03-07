@@ -25,13 +25,6 @@
 #   install: ignore           # skip on this distro
 #
 packages:
-  # ── brightness ────────────────────────────────────────────────────────────────
-  - brightnessctl
-
-  # ── editors ───────────────────────────────────────────────────────────────────
-  - helix
-  - emacs
-
   # ── terminal ──────────────────────────────────────────────────────────────────
   - foot
   - atuin
@@ -41,7 +34,17 @@ packages:
     bin: tldr
     fedora:
         check: which
-    
+  # ── shell ─────────────────────────────────────────────────────────────────────
+  - fish
+  # ── editors ───────────────────────────────────────────────────────────────────
+  - helix
+  - emacs
+  # ── editor tools ──────────────────────────────────────────────────────────────
+  - name: hx-lsp
+    via: cargo
+  - taplo
+  # - markdown-oxide
+  # - clangd
 
   # ── bar / notifications / idle ────────────────────────────────────────────────
   - name: waybar
@@ -53,14 +56,15 @@ packages:
   - hypridle
   - wlopm
 
+  # ── brightness ────────────────────────────────────────────────────────────────
+  - brightnessctl
+
   # ── clipboard ─────────────────────────────────────────────────────────────────
   - cliphist
   - wl-clipboard
   # - name: wl-clip-persist
   #   via: cargo
 
-  # ── shell ─────────────────────────────────────────────────────────────────────
-  - fish
 
   # ── launcher ──────────────────────────────────────────────────────────────────
   - rofi
@@ -141,8 +145,6 @@ packages:
       install: exclusive
 
   # ── comms ─────────────────────────────────────────────────────────────────────
-  # - name: aparte
-  #   via: cargo
   - name: iamb
     via: cargo
     opensuse:

@@ -3,6 +3,12 @@ config.set("colors.webpage.preferred_color_scheme", "dark")
 config.set("qt.args", ["--force-dark-mode"])
 
 config.bind(";v", "hint links spawn mpv {hint-url}")
+config.bind("j", "scroll-page 0 0.5", mode="normal")
+config.bind("k", "scroll-page 0 -0.5", mode="normal")
+config.bind("h", "tab-prev", mode="normal")
+config.bind("l", "tab-next", mode="normal")
+config.bind("ge", "scroll-to-perc 100", mode="normal")
+config.unbind("G", mode="normal")
 
 c.url.searchengines = {
     "DEFAULT": "https://google.com/search?hl=en&q={}",
