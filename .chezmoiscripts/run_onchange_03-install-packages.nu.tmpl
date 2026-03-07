@@ -1,4 +1,5 @@
 #!/usr/bin/env nu
+# packages.yaml hash: {{ include (joinPath .chezmoi.sourceDir ".chezmoidata/packages.yaml") | sha256sum }}
 
 print "getting missing packages..."
 

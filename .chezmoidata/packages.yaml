@@ -51,6 +51,7 @@ packages:
   - name: libnotify
     check: notify-send
   - hypridle
+  - wlopm
 
   # ── clipboard ─────────────────────────────────────────────────────────────────
   - cliphist
