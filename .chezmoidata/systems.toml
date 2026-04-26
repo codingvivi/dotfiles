@@ -14,6 +14,9 @@
 #   skip_via           — list of `via` values from packages.yaml to skip entirely
 #                        on this system (e.g. ["cargo", "uv", "go", "mise"] to
 #                        avoid running language toolchain installers). Optional.
+#   default_check      — fallback `check` value used when a `via: pkg` package
+#                        doesn't specify its own check. "rpm" on rpm-based
+#                        distros, "which" elsewhere. Optional, defaults to "rpm".
 #
 # To support a new distro, add a new [systems.<name>] table.
 
@@ -29,30 +32,8 @@ install = ["sudo", "dnf", "install", "-y", "--skip-unavailable", "--skip-broken"
 ids = ["darwin"]
 install = ["brew", "install"]
 exclude_by_default = true
-skip_via = ["cargo", "uv", "go", "mise"]
-ignore = [
-    "dot_config/alot/",
-    "dot_config/aparte/",
-    "dot_config/broot/",
-    "dot_config/foot/",
-    "dot_config/hypr/**",
-    "dot_config/mango/**",
-    "dot_config/waybar/**",
-    "dot_config/mako/**",
-    "dot_config/swaylock/**",
-    "dot_config/foot/**",
-    "dot_config/environment.d/**",
-    "dot_config/systemd/**",
-    "dot_config/feh/**",
-    "dot_local/bin/executable_mango-session",
-    "dot_local/bin/executable_mmsg-vv",
-    "dot_local/bin/executable_notif",  
-    "dot_local/bin/executable_open-in-browser",
-    "dot_local/bin/executable_unlock-secrets", 
-    "dot_local/bin/executable_wallpaper-playlist.tmpl",
-    "dot_local/bin/symlink_glide",
-     ".chezmoiscripts/run_onchange_04-setup-kanata.nu",
-]
+skip_via = ["cargo", "uv"]
+default_check = "which"
 
 # [systems.macos]
 # ids = ["darwin"]

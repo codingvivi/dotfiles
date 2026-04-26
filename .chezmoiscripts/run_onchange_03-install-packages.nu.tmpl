@@ -38,7 +38,7 @@ let install_cmd = ($candidates | first | get sys.install)
 
 # Resolves a single YAML entry against the current distro.
 # Returns a normalized record, or null if the entry should be skipped.
-def resolve [distro: string, exclude_default: bool, known_distros: list<string>] {
+def resolve [distro: string, exclude_default: bool, known_distros: list<string>, default_check: string] {
     let entry = $in
 
     # Normalize: plain string → minimal record
@@ -83,7 +83,7 @@ def resolve [distro: string, exclude_default: bool, known_distros: list<string>]
         let via   = $cleaned | get -o via   | default "pkg"
         let bin   = $cleaned | get -o bin   | default $cleaned.name
         let pkg   = $cleaned | get -o pkg   | default $cleaned.name
-        let check = $cleaned | get -o check | default (if $via == "pkg" { "rpm" } else { "which" })
+        let check = $cleaned | get -o check | default (if $via == "pkg" { $default_check } else { "which" })
 
         $cleaned | merge {via: $via, check: $check, bin: $bin, pkg: $pkg}
     }
@@ -95,9 +95,10 @@ print $"detecting distro: ($distro)"
 
 let known_distros = $systems | columns
 let exclude_default = ($systems | get $distro | get -o exclude_by_default | default false)
+let default_check = ($systems | get $distro | get -o default_check | default "rpm")
 
 let packages = (open $yaml_path).packages
-    | each {|e| $e | resolve $distro $exclude_default $known_distros}
+    | each {|e| $e | resolve $distro $exclude_default $known_distros $default_check}
     | compact
 
 print $"resolved ($packages | length) packages for ($distro)"

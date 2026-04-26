@@ -7,7 +7,6 @@
 !.chezmoiscripts/02-install-toolchains.nu
 !.chezmoiscripts/03-install-packages.nu
 !.chezmoiscripts/05-setup-emacs.nu
-!.chezmoiscripts/06-install-glide.nu
 !.chezmoiscripts/every_99-validate-configs.nu
 !.config
 !.config/Code

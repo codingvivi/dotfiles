@@ -1,21 +1,51 @@
 #!/usr/bin/env nu
+# systems.toml hash: {{ include (joinPath .chezmoi.sourceDir ".chezmoidata/systems.toml") | sha256sum }}
+
 print "installing missing tools and package managers..."
 
-if (which rustup | is-empty) {
+# ── distro detection (mirrors 03-install-packages) ────────────────────────────
+
+let systems = (open "{{ .chezmoi.sourceDir }}/.chezmoidata/systems.toml").systems
+
+let os_id = if ("/etc/os-release" | path exists) {
+    open /etc/os-release
+        | lines
+        | parse "{key}={value}"
+        | where key == "ID"
+        | first
+        | get value
+        | str trim --char '"'
+} else {
+    ^uname -s | str trim | str downcase
+}
+
+let candidates = ($systems | transpose name sys | where {|r| $os_id in $r.sys.ids})
+let skip_via = if ($candidates | is-empty) { [] } else { $candidates | first | get sys | get -o skip_via | default [] }
+
+# ── toolchain installs (each gated by skip_via) ───────────────────────────────
+
+# rust → cargo
+if "cargo" in $skip_via {
+    print "skipping rust (cargo in skip_via)"
+} else if (which rustup | is-empty) {
     print "installing rust..."
     ^curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | ^sh -s -- -y
 } else {
     print "rust already installed, skipping"
 }
 
-if (which uv | is-empty) {
+if "uv" in $skip_via {
+    print "skipping uv (uv in skip_via)"
+} else if (which uv | is-empty) {
     print "installing uv..."
     ^curl -LsSf https://astral.sh/uv/install.sh | ^sh
 } else {
     print "uv already installed, skipping"
 }
 
-if (which mise | is-empty) {
+if "mise" in $skip_via {
+    print "skipping mise (mise in skip_via)"
+} else if (which mise | is-empty) {
     print "installing mise..."
     ^curl https://mise.run | ^sh
 } else {
