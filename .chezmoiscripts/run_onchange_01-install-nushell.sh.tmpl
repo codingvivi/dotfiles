@@ -3,8 +3,8 @@ set -euo pipefail
 
 echo "determining distro..."
 
-{{- $id := .chezmoi.osRelease.id -}}
-{{- if eq $id "" -}}{{- $id = .chezmoi.os -}}{{- end -}}
+{{- $id := .chezmoi.os -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}{{- $id = .chezmoi.osRelease.id -}}{{- end -}}
 {{- $matched := false -}}
 {{- range $name, $sys := .systems -}}
 {{- if has $id $sys.ids }}

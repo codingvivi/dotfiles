@@ -1,7 +1,7 @@
 .config/nushell/history.txt
 README.md
-{{ $id := .chezmoi.osRelease.id -}}
-{{ if eq $id "" }}{{ $id = .chezmoi.os }}{{ end -}}
+{{ $id := .chezmoi.os -}}
+{{ if hasKey .chezmoi.osRelease "id" -}}{{ $id = .chezmoi.osRelease.id -}}{{ end -}}
 {{ if eq $id "darwin" -}}
 {{ include ".chezmoiignore_darwin" }}
 {{- else -}}
