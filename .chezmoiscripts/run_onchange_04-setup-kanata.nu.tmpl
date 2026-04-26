@@ -4,7 +4,7 @@ print "setting up kanata..."
 
 # ── kanata ─────────────────────────────────────────────────────────────────────
 
-{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
+{{ if eq (dig "id" "" .chezmoi.osRelease) "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
 # symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
 let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
 

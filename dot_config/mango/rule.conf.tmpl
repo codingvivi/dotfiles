@@ -1,4 +1,4 @@
-{{ if eq .chezmoi.osRelease.id "fedora" -}}
+{{ if eq (dig "id" "" .chezmoi.osRelease) "fedora" -}}
 monitorrule=name:eDP-1,width:3456,height:2234,refresh:120,x:0,y:10,scale:1.4
 {{ end -}}
 monitorrule=model:MAG321UX OLED,width:3840,height:2160,scale:1.0,refresh:240,vrr:0,x:0

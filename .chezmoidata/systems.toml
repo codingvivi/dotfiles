@@ -32,7 +32,7 @@ install = ["sudo", "dnf", "install", "-y", "--skip-unavailable", "--skip-broken"
 ids = ["darwin"]
 install = ["brew", "install"]
 exclude_by_default = true
-skip_via = ["cargo", "uv"]
+skip_via = ["mise", "go"]
 default_check = "which"
 
 # [systems.macos]

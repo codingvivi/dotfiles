@@ -67,9 +67,6 @@
 !.config/helix/themes/vivicarbon_translucent.toml
 !.config/iamb
 !.config/iamb/config.toml
-!.config/imapnotify
-!.config/imapnotify/aol.json
-!.config/isyncrc
 !.config/jj
 !.config/jj/config.toml
 !.config/kanata

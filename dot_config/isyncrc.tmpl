@@ -5,7 +5,7 @@ Host imap.aol.com
 User {{ .email }}
 PassCmd "pass email/aol | grep '^app-tw-fw25:' | cut -d' ' -f2"
 TLSType IMAPS
-CertificateFile {{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" }}/etc/ssl/ca-bundle.pem{{ else if eq .chezmoi.osRelease.id "fedora" "asahi-remix" }}/etc/pki/tls/certs/ca-bundle.crt{{ else }}/etc/ssl/certs/ca-certificates.crt{{ end }}
+CertificateFile {{ if eq (dig "id" "" .chezmoi.osRelease) "opensuse-tumbleweed" "opensuse-leap" "opensuse" }}/etc/ssl/ca-bundle.pem{{ else if eq (dig "id" "" .chezmoi.osRelease) "fedora" "asahi-remix" }}/etc/pki/tls/certs/ca-bundle.crt{{ else }}/etc/ssl/certs/ca-certificates.crt{{ end }}
 PipelineDepth 5
 
 # REMOTE STORAGE (The AOL server)
