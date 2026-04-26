@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+GPG_TTY=$(tty)
+export GPG_TTY
+
+prefix="id_ed25519_"
+suffix=""
+
+if [[ $# -gt 0 && "$1" != -* ]]; then
+  suffix="$1"
+  shift
+fi
+
+while getopts "s:" opt; do
+  case $opt in
+    s) suffix="$OPTARG" ;;
+  esac
+done
+
+name="${prefix}${suffix}"
+# Prime gpg-agent cache while we have a TTY, so SSH_ASKPASS
+# (which runs without a TTY) can use the cached passphrase.
+pass show "ssh/$name" > /dev/null
+SSH_ASKPASS=~/.local/bin/pass-ssh-askpass \
+SSH_PASS_ENTRY="ssh/$name" \
+SSH_ASKPASS_REQUIRE=prefer \
+ssh-add ~/.ssh/"$name"
+

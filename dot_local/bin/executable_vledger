@@ -1,0 +1,201 @@
+#!/usr/bin/env -S nu --no-std-lib
+
+# Discover accounts from subdirectories in $STATEMENT_DIR.
+# Convention: dir "Kskbb" → account "kskbb", rules "kskbb.csv.rules", journal "kskbb.journal"
+# 
+def accounts [] {
+  ls $env.STATEMENT_DIR
+  | where type == dir
+  | get name
+  | each {|dir|
+    let name = $dir | path basename | str downcase
+    {
+      name: $name
+      statement_dir: $dir
+      rules_file: ($env.HLEDGER_DIR | path join $"($name).csv.rules")
+      journal_file: ($env.HLEDGER_DIR | path join $"($name).journal")
+    }
+  }
+  | reduce -f {} {
+    |it, acc|
+      $acc
+      | insert $it.name {
+        statement_dir: $it.statement_dir,
+        rules_file: $it.rules_file,
+        journal_file: $it.journal_file
+      }
+  }
+}
+
+def main [] {
+  help main
+}
+
+def "main import" [
+  account?: string
+  --dry-run (-n)
+  --force (-f)      # clear journal and re-import all statements
+] {
+  let accts = accounts
+
+  let to_import = match ($account != null) {
+    false => $accts
+    true => {
+      if $account not-in $accts {
+        let available = $accts | columns | str join ", "
+        error make { msg: $"Unknown account: '($account)'. Available: ($available)" }
+      }
+      { $account: ($accts | get $account) }
+    }
+  }
+
+  let flags = match $dry_run { true => [--dry-run], false => [] }
+
+  $to_import
+  | items {
+    |name, config|
+      if $force and (not $dry_run) { reset-account $name $config }
+      import-account $name $config $flags
+    }
+  | ignore
+}
+
+# Clear journal and remove .latest marker files so hledger re-imports everything
+def reset-account [name: string, config: record] {
+  if ($config.journal_file | path exists) {
+    print $"(ansi yellow)Clearing ($config.journal_file | path basename)(ansi reset)"
+    "" | save -f $config.journal_file
+  }
+
+  glob ($config.statement_dir | path join ".latest.*")
+  | each {|f|
+    print $"(ansi yellow)Removing marker ($f | path basename)(ansi reset)"
+    rm $f
+  }
+}
+
+def import-account [
+  name: string
+  config: record
+  flags: list<string>
+] {
+  let skip_reason = match true {
+    _ if not ($config.statement_dir | path exists) => $"no statement directory at ($config.statement_dir)"
+    _ if not ($config.rules_file | path exists) => $"no rules file at ($config.rules_file)"
+    _ => null
+  }
+
+  if $skip_reason != null {
+    print $"(ansi yellow)Skipping ($name): ($skip_reason)(ansi reset)"
+    return
+  }
+
+  let csv_files = find-csv-files $config.statement_dir
+
+  if ($csv_files | is-empty) {
+    print $"(ansi yellow)No CSV files found in ($config.statement_dir)(ansi reset)"
+    return
+  }
+
+  # Ensure all CSVs are UTF-8
+  let utf8_files = $csv_files | each {|f| ensure-utf8 $f }
+
+  let mode = match ($flags | is-empty) { true => "", false => $" \(($flags | str join ' ')\)" }
+
+  print $"(ansi green)Importing ($utf8_files | length) file\(s\) for ($name)($mode)...(ansi reset)"
+
+  $utf8_files | each {|f|
+    print $"  ($f | path basename)"
+    hledger import -f $config.journal_file --rules-file $config.rules_file ...$flags $f
+  }
+
+  print $"(ansi green)Done with ($name).(ansi reset)"
+}
+
+# Find CSV files in a directory, deduplicating original/utf-8 pairs (prefer utf-8)
+def find-csv-files [dir: path]: nothing -> list<path> {
+  let all_csv = (ls $dir
+    | where type == file
+    | where { ($in.name | path parse).extension | str downcase | $in == "csv" }
+    | get name)
+
+  # Group by base stem (strip _utf-8 suffix) to deduplicate
+  $all_csv
+  | group-by {|f| $f | path parse | get stem | str replace '_utf-8' '' }
+  | values
+  | each {|group|
+    let utf8 = $group | where {|f| ($f | path parse | get stem) | str ends-with '_utf-8' }
+    match ($utf8 | is-not-empty) {
+      true => ($utf8 | first),
+      false => ($group | first)
+    }
+  }
+}
+
+# Re-encode a file to UTF-8 if needed; returns path to the UTF-8 version
+def ensure-utf8 [file: path]: nothing -> path {
+  if (is-compatible $file) {
+    return $file
+  }
+
+  let original_enc = get-encoding $file
+  let p = $file | path parse
+  let new_file = $p.parent | path join $"($p.stem)_utf-8.($p.extension)"
+
+  if ($new_file | path exists) and (is-compatible $new_file) {
+    return $new_file
+  }
+
+  print $"  re-encoding ($file | path basename) from ($original_enc) → UTF-8"
+  iconv -f $original_enc -t UTF-8 $file -o $new_file
+  $new_file
+}
+
+# Re-encode a single file to UTF-8 (standalone command)
+def "main reencode" [file: path] {
+  if (is-compatible $file) {
+    print $"($file) is already UTF-8. Skipping"
+    return
+  }
+
+  let original_enc = get-encoding $file
+  let p = ($file | path parse)
+  let new_file = $"($p.stem)_utf-8.($p.extension)"
+
+  if ($new_file | path exists) and (is-compatible $new_file) {
+    print $"($new_file) already exists and is UTF-8. Skipping"
+    return
+  }
+
+  print $"($file) is ($original_enc). Converting..."
+  iconv -f $original_enc -t UTF-8 $file -o $new_file
+  print $"written to ($new_file)"
+}
+
+# List configured accounts and their status
+def check-mark [path: path] {
+  match ($path | path exists) { true => "✓", false => "✗" }
+}
+
+def "main accounts" [] {
+  accounts | items {|name, config|
+    {
+      account: $name
+      statements: (check-mark $config.statement_dir)
+      rules: (check-mark $config.rules_file)
+      journal: (check-mark $config.journal_file)
+    }
+  }
+}
+
+def is-compatible [file: path] {
+  get-encoding $file | is-utf-8 $in
+}
+
+def get-encoding [file: path] {
+  file -i $file | split row " " | get 2 | split row "=" | get 1
+}
+
+def is-utf-8 [encoding: string] {
+  $encoding | str contains --ignore-case "UTF-8"
+}

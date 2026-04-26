@@ -1,0 +1,7 @@
+[ghq]
+root = ~/code
+[user]
+	name = vivi
+	email = 135711465+codingvivi@users.noreply.github.com
+[url "git@github.com:"]
+	insteadOf = https://github.com/

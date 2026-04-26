@@ -1,0 +1,12 @@
+
+[Unit]
+Description=MPD Activity Logger
+PartOf=graphical-session.target
+After=mpd.service
+
+[Service]
+ExecStart=%h/.cargo/bin/rmpc idle
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

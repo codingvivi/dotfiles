@@ -1,0 +1,187 @@
+#!/usr/bin/env nu
+# packages.yaml hash: {{ include (joinPath .chezmoi.sourceDir ".chezmoidata/packages.yaml") | sha256sum }}
+# systems.toml hash: {{ include (joinPath .chezmoi.sourceDir ".chezmoidata/systems.toml") | sha256sum }}
+
+print "getting missing packages..."
+
+let yaml_path = "{{ .chezmoi.sourceDir }}/.chezmoidata/packages.yaml"
+let systems_path = "{{ .chezmoi.sourceDir }}/.chezmoidata/systems.toml"
+
+# ── distro detection ──────────────────────────────────────────────────────────
+
+let systems = (open $systems_path).systems
+
+let os_id = if ("/etc/os-release" | path exists) {
+    open /etc/os-release
+        | lines
+        | parse "{key}={value}"
+        | where key == "ID"
+        | first
+        | get value
+        | str trim --char '"'
+} else {
+    ^uname -s | str trim | str downcase
+}
+
+let candidates = ($systems
+    | transpose name sys
+    | where {|r| $os_id in $r.sys.ids})
+
+if ($candidates | is-empty) {
+    error make {msg: $"Unsupported distro: ($os_id)"}
+}
+
+let distro = ($candidates | first | get name)
+let install_cmd = ($candidates | first | get sys.install)
+
+# ── package resolution ────────────────────────────────────────────────────────
+
+# Resolves a single YAML entry against the current distro.
+# Returns a normalized record, or null if the entry should be skipped.
+def resolve [distro: string, exclude_default: bool, known_distros: list<string>] {
+    let entry = $in
+
+    # Normalize: plain string → minimal record
+
+    let base = match ($entry | describe) {
+      "string" => {name: $entry}
+      _ => $entry
+    }
+
+    # Get this distro's override block (null if absent)
+    let distro_block = $base | get -o $distro
+
+    # Check if any distro block claims exclusive ownership
+    let has_exclusive = (
+        $known_distros
+        | any {|d| ($d in $base) and (($base | get $d | get -o install) == "exclusive") }
+    )
+
+    let this_install = if $distro_block != null { $distro_block | get -o install } else { null }
+    let opted_in = ($this_install == "include") or ($this_install == "exclusive")
+
+    let skip = (
+        ($this_install == "ignore")
+        or ($has_exclusive and $this_install != "exclusive")
+        or ($exclude_default and not $opted_in)
+    )
+
+    if not $skip {
+        # Merge distro block over base, then strip all meta keys
+        let merged = if $distro_block != null { $base | merge $distro_block } else { $base }
+        let cleaned = (
+            ($known_distros ++ ["install"])
+            | reduce -f $merged {|k, acc |
+                match ($k in $acc) {
+                    true => { $acc | reject $k }
+                    _ => $acc
+                }
+            }
+        )
+
+        # Apply defaults for omitted fields
+        let via   = $cleaned | get -o via   | default "pkg"
+        let bin   = $cleaned | get -o bin   | default $cleaned.name
+        let pkg   = $cleaned | get -o pkg   | default $cleaned.name
+        let check = $cleaned | get -o check | default (if $via == "pkg" { "rpm" } else { "which" })
+
+        $cleaned | merge {via: $via, check: $check, bin: $bin, pkg: $pkg}
+    }
+}
+
+# ── load and resolve ──────────────────────────────────────────────────────────
+
+print $"detecting distro: ($distro)"
+
+let known_distros = $systems | columns
+let exclude_default = ($systems | get $distro | get -o exclude_by_default | default false)
+
+let packages = (open $yaml_path).packages
+    | each {|e| $e | resolve $distro $exclude_default $known_distros}
+    | compact
+
+print $"resolved ($packages | length) packages for ($distro)"
+
+# ── install functions ─────────────────────────────────────────────────────────
+
+def not-installed [] {
+    $in | where {|p|
+        match $p.check {
+            "rpm"   => { (^rpm -q $p.pkg | complete).exit_code != 0 }
+            "which" => { which $p.bin | is-empty }
+        }
+    }
+}
+
+def install-pkg [install_cmd: list<string>] {
+    let pkgs = $in
+
+    # Packages without a repo: batch check → single install call
+    let missing = $pkgs | where {|p| ($p | get -o repo) == null} | not-installed | get pkg
+
+    if ($missing | is-not-empty) {
+        print $"  pkg: installing ($missing | length) missing: ($missing | str join ', ')"
+        let head = $install_cmd | first
+        let tail = $install_cmd | skip 1
+        ^$head ...$tail ...$missing
+    } else {
+        print "  pkg: all packages already installed"
+    }
+
+    # Packages with a repo: filter to uninstalled, add repo + install individually
+    $pkgs
+        | where {|p| ($p | get -o repo) != null}
+        | not-installed
+        | each {|p|
+            print $"  pkg+repo: installing ($p.name)..."
+            try { sudo zypper addrepo --refresh $p.repo }
+            sudo zypper refresh
+            sudo zypper --non-interactive install $p.pkg
+        }
+}
+
+def install-args [] {
+    let p = $in
+    match ($p | get -o args) {
+        null => [$p.name]
+        _ => $p.args
+    }
+}
+
+def install-tool [via: string] {
+    $in
+        | not-installed
+        | each {|p|
+            print $"  ($via): installing ($p.name)..."
+            let args = $p | install-args
+            match $via {
+                "cargo" => { ^cargo install ...$args }
+                "uv"    => { ^uv tool install ...$args }
+                "go"    => { ^go install ...$args }
+                "mise"  => { ^mise use -g ...$args }
+            }
+        }
+}
+
+# ── main ──────────────────────────────────────────────────────────────────────
+
+print "installing missing packages..."
+
+let skip_via = ($systems | get $distro | get -o skip_via | default [])
+
+for via in ["pkg" "cargo" "uv" "go" "mise"] {
+    print $"── ($via) ──────────────────────────────────────"
+    if $via in $skip_via {
+        print "  skipped (skip_via)"
+    } else {
+        let pkgs = $packages | where via == $via
+        match $via {
+            "pkg" => { $pkgs | install-pkg $install_cmd }
+            _     => { $pkgs | install-tool $via }
+        }
+    }
+}
+
+print "── done ─────────────────────────────────────────"
+
+print "all missing packages installed! (that chezmoi knows about anyway)"

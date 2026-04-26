@@ -1,0 +1,49 @@
+plugins: autobpm chroma edit fromfilename info musicbrainz types unimported
+
+directory: ~/Music/Library
+
+paths:
+  default: $albumartist/$original_year/$album%aunique{}/$track - $artist - $title
+  singleton: $artist/$original_year/$artist - $title
+  comp: $artist/$original_year/$track - $artist - $title%sunique{}
+
+asciify_paths: yes
+
+
+import:
+  timid: yes
+  write: yes
+  move: yes
+  copy: no
+
+albumtypes:
+  types:
+    - ep: 'EP'
+    - single: 'Single'
+    - soundtrack: 'OST'
+    - live: 'Live'
+    - compilation: 'Compilation'
+    - dj-mix: 'Mix'
+  ignore_va: compilation
+  bracket: '[]'
+
+autobpm:
+  auto: no
+
+chroma:
+  auto: no
+
+edit:
+  itemfields: track title artist album year original_year dj-lib
+
+types:
+  dj-lib: bool
+  dj-import: int
+  
+unimported:
+  ignore_extensions: jpg png beets
+  ignore_subdirectories: NonMusic data temp
+
+
+
+

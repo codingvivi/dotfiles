@@ -1,0 +1,1 @@
+text/html; cha -d -T text/html '%s'; copiousoutput

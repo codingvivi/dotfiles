@@ -1,0 +1,12 @@
+
+[Unit]
+Description=Wayland Clipboard Persist
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/wl-clip-persist --clipboard regular --reconnect-tries 0
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

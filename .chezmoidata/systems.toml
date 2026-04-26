@@ -1,0 +1,86 @@
+# System definitions consumed by chezmoi scripts.
+#
+# Each entry under [systems.<name>] declares:
+#   ids                — values matched against the detected system identifier:
+#                        on Linux this is the `ID` from /etc/os-release;
+#                        on systems without /etc/os-release (e.g. macOS), it
+#                        is `uname -s` lowercased (e.g. "darwin").
+#   install            — package manager invocation as a list; packages get appended
+#   exclude_by_default — if true, skip every entry in packages.yaml on this system
+#                        unless the entry has `<name>: { install: include }` (or
+#                        `install: exclusive`). Optional, defaults to false.
+#   ignore             — list of source-path patterns chezmoi should not deploy on
+#                        this system. Consumed by .chezmoiignore.tmpl. Optional.
+#   skip_via           — list of `via` values from packages.yaml to skip entirely
+#                        on this system (e.g. ["cargo", "uv", "go", "mise"] to
+#                        avoid running language toolchain installers). Optional.
+#
+# To support a new distro, add a new [systems.<name>] table.
+
+[systems.opensuse]
+ids = ["opensuse-tumbleweed", "opensuse-leap", "opensuse"]
+install = ["sudo", "zypper", "install"]
+
+[systems.fedora]
+ids = ["fedora", "fedora-asahi-remix"]
+install = ["sudo", "dnf", "install", "-y", "--skip-unavailable", "--skip-broken"]
+
+[systems.macos]
+ids = ["darwin"]
+install = ["brew", "install"]
+exclude_by_default = true
+skip_via = ["cargo", "uv", "go", "mise"]
+ignore = [
+    "dot_config/alot/",
+    "dot_config/aparte/",
+    "dot_config/broot/",
+    "dot_config/foot/",
+    "dot_config/hypr/**",
+    "dot_config/mango/**",
+    "dot_config/waybar/**",
+    "dot_config/mako/**",
+    "dot_config/swaylock/**",
+    "dot_config/foot/**",
+    "dot_config/environment.d/**",
+    "dot_config/systemd/**",
+    "dot_config/feh/**",
+    "dot_local/bin/executable_mango-session",
+    "dot_local/bin/executable_mmsg-vv",
+    "dot_local/bin/executable_notif",  
+    "dot_local/bin/executable_open-in-browser",
+    "dot_local/bin/executable_unlock-secrets", 
+    "dot_local/bin/executable_wallpaper-playlist.tmpl",
+    "dot_local/bin/symlink_glide",
+     ".chezmoiscripts/run_onchange_04-setup-kanata.nu",
+]
+
+# [systems.macos]
+# ids = ["darwin"]
+# install = ["brew", "install"]
+# exclude_by_default = true
+# ignore = [
+#     "dot_config/hypr/**",
+#     "dot_config/mango/**",
+#     "dot_config/waybar/**",
+#     "dot_config/mako/**",
+#     "dot_config/swaylock/**",
+#     "dot_config/foot/**",
+#     "dot_config/environment.d/**",
+#     "dot_config/systemd/**",
+#     "dot_config/feh/**",
+#     "dot_local/bin/executable_mango-session",
+#     "dot_local/bin/executable_mmsg-vv",
+#     "dot_local/bin/executable_42_cformat_enhanced",
+#     "dot_local/bin/executable_42header",
+#     "dot_local/bin/executable_mango-session",
+#     "dot_local/bin/executable_mmsg-vv",
+#     "dot_local/bin/executable_notif",  
+#     "dot_local/bin/executable_open-in-browser",
+#     "dot_local/bin/executable_pass-ssh-askpass", 
+#     "dot_local/bin/executable_ssh-add-pass", 
+#     "dot_local/bin/executable_unlock-secrets", 
+#     "dot_local/bin/executable_vledger",
+#     "dot_local/bin/executable_wallpaper-playlist.tmpl",
+#     "dot_local/bin/symlink_glide",
+#      ".chezmoiscripts/run_onchange_04-setup-kanata.nu",
+# ]

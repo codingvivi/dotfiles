@@ -1,0 +1,11 @@
+[Unit]
+Description=Rust CLI Pomodoro Timer
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.cargo/bin/pomodoro --config %h/.config/rust-cli-pomodoro/configuration.json
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

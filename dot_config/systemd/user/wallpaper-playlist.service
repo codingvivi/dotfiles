@@ -1,0 +1,10 @@
+[Unit]
+Description=Used only for chaging wallpaper so far
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/wallpaper-playlist next
+
+[Install]
+WantedBy=default.target

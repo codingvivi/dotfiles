@@ -1,0 +1,13 @@
+
+[Unit]
+Description=Clipboard History Service
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+# We use 'sh -c' here because of the pipe (|)
+ExecStart=/usr/bin/sh -c "wl-paste --type text --watch cliphist store"
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

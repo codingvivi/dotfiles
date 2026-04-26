@@ -1,0 +1,4 @@
+#!/bin/bash
+# SSH_ASKPASS helper — retrieves SSH key passphrase from pass
+entry="${SSH_PASS_ENTRY:-ssh/id_ed25519}"
+pass show "$entry"

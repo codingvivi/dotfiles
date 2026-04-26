@@ -1,0 +1,204 @@
+"attribute" = { fg = "base0E" }
+
+"type" = { fg = "base09" }
+
+"constructor" = { fg = "base08" }
+
+"constant" = { fg = "base0E" }
+"constant.builtin" = { fg = "base07" }
+"constant.character" = { fg = "base0E" }
+"constant.character.escape" = { fg = "base0F" }
+"constant.numeric" = { fg = "base0F" }
+
+"string" = { fg = "base0E" }
+"string.special.path" = { fg = "base0E" }
+"string.special.url" = { fg = "base0E" }
+"string.special.symbol" = { fg = "base07" }
+"string.regexp" = { fg = "base07" }
+
+"comment" = { fg = "base03" }
+
+"variable" = { fg = "base04" }
+"variable.builtin" = { fg = "base07" }
+"variable.other.member" = { fg = "base0A"  }
+"variable.other.member.private" = { fg = "base0A"  }
+
+ "label" = { fg = "base09" }
+ "punctuation" = { fg = "base08" }
+
+"keyword" = { fg = "base09" }
+"keyword.control.exception" = { fg = "base09" }
+"keyword.operator" = { fg = "base09" }
+"keyword.function" = { fg = "base08" }
+#"keyword.storage.type" = { fg = "base07"}
+"keyword.storage.type" = { fg = "extra1"}
+"keyword.storage.modifier" = { fg = "base07"}
+#"keyword.storage.modifier" = { fg = "#ffdc69"}
+"keyword.directive" = { fg = "base09" }
+
+"operator" = { fg = "base09" }
+
+"function" = { fg = "base0C", modifiers = ["bold"] }
+"function.builtin" = { fg = "base0C" }
+"function.method" = { fg = "base0C" }
+"function.macro" = { fg = "base07" }
+"function.special" = { fg = "base09" }
+
+"tag" = { fg = "base0E" }
+
+"namespace" = { fg = "base04" }
+
+"special" = { fg = "base09" }
+
+"markup.heading.1" = { fg = "base0C" }
+"markup.heading.2" = { fg = "base0C" }
+"markup.heading.3" = { fg = "base0C" }
+"markup.heading.4" = { fg = "base0C" }
+"markup.heading.5" = { fg = "base0C" }
+"markup.heading.6" = { fg = "base0C" }
+
+"markup.list" = { fg = "base09"}
+
+"markup.bold" = { fg = "base0A" }
+
+"markup.link" = { fg = "base0E" }
+ 
+"diff.plus" = { fg = "base0D", bg = "base02" }
+"diff.minus" = { fg = "color_error", bg = "base02" }
+"diff.delta" = { fg = "base0B", bg = "base01" }
+
+############ UI ###############
+"ui.background" = { fg= "base06", bg = "base00"}
+
+"ui.selection" = { bg = "base02"}
+
+"ui.text" = { fg = "base06" }
+
+"ui.popup" = { fg= "base06", bg = "base00"}
+"ui.popup.info" = { fg= "base09", bg = "base00"}
+
+"ui.cursor.primary" = { fg = "base00", bg = "base04" }
+"ui.cursor.primary.normal" = { fg = "base00", bg = "base09", modifiers = ["slow_blink"]}
+"ui.cursor.primary.insert" = { fg = "base00", bg = "base0E" }
+"ui.cursor.primary.match" = { fg = "base00", bg = "base0D" }
+"ui.cursor.primary.select" = { fg = "base00", bg = "base0D" }
+
+"ui.linenr" = { fg = "base03"} #, bg = "base00" }
+"ui.linenr.selected" = { fg = "base04" }
+
+"ui.statusline" = { fg = "base06", bg = "base00" }
+"ui.statusline.inactive" = { fg = "base03"}
+"ui.statusline.normal" = { fg = "base00", bg = "base09"}
+"ui.statusline.insert" = { fg = "base00", bg = "base0C" }
+"ui.statusline.select" = { fg = "base00", bg = "base0E" }
+
+"ui.virtual.indent-guide" = { fg = "base03" }
+
+"ui.virtual.jump-label" = { fg = "base0B"}
+"ui.window" = { fg = "base06", bg = "base01" }
+
+"ui.menu" = { fg = "base06", bg = "base01" }
+"ui.menu.selected" = { fg = "base06", bg = "base03" }
+
+"diagnostic.hint" = { fg = "base0D", bg = "base01", underline = { color = "base0D", style = "curl"} }
+"diagnostic.info" = { fg = "base0B", bg = "base01", underline = { color = "base0B", style = "curl"} }
+"diagnostic.warning" = { fg = "color_warn", bg = "base01", underline = { color = "color_warn", style = "curl"} }
+"diagnostic.error" = { fg = "color_error", bg = "base01", underline = { color = "color_error", style = "curl"} }
+"diagnostic.unnecessary" = { fg = "base0B", bg = "base01", underline = { color = "base0B", style = "curl"} }
+"diagnostic.deprecated" = { fg = "color_warn", bg = "base01", underline = { color = "color_warn", style = "curl"} }
+
+"error" = { fg = "color_error", bg = "base01" }
+"warning" = { fg = "color_warn", bg = "base01" }
+
+######### org #############
+
+"OrgHeadlineLevel1" = { fg = "base0C", modifiers = ["bold"] }
+"OrgHeadlineLevel2" = { fg = "base04", modifiers = ["bold"] }
+"OrgHeadlineLevel3" = { fg = "#ffdc69", modifiers = ["bold"] }
+"OrgHeadlineLevel5" = { fg = "base0C", modifiers = ["bold"] }
+
+"OrgStars1" = { fg = "base03" }
+"OrgStars2" = { fg = "base03" }
+"OrgStars3" = { fg = "base03" }
+"OrgStars4" = { fg = "base03" }
+"OrgStars5" = { fg = "base03" }
+"OrgStars6" = { fg = "base03" }
+
+"OrgKeywordTodo" = { fg = "color_add", modifiers = ["bold"] }
+"OrgKeywordIdea" = { fg = "color_add", modifiers = ["bold"] } 
+"OrgKeywordWait" = { fg = "color_warn", modifiers = ["bold"] } 
+"OrgKeywordHold" = { fg = "color_warn", modifiers = ["bold"] } 
+"OrgKeywordDone" = { fg = "base03", modifiers = ["bold"] }     
+"OrgKeywordKill" = { fg = "color_error", modifiers = ["bold"] } 
+
+"OrgPriority"       = { fg = "base0A", modifiers = ["bold"] }
+"OrgPriorityCookie" = { fg = "base03" }
+
+"OrgTimestampActive"   = { fg = "base0F", modifiers = ["bold"] }
+"OrgTimestampInactive" = { fg = "base0F" }
+"OrgTimestampDay"      = { fg = "base0F" }
+"OrgTimestampDate"     = { fg = "base0F" }
+
+"OrgPropertyDrawer" = { fg = "base0A" }
+"OrgDrawerName"     = { fg = "base0A" } 
+"OrgPropertyName"   = { fg = "base0E" } 
+"OrgPropertyValue"  = { fg = "base09" }
+
+"OrgDirectiveName"  = { fg = "base07" } # Gray for the key
+"OrgDirectiveValue" = { fg = "base0E" } # Purple for the value
+
+# Tags (:work:home:)
+"OrgTag"     = { fg = "base0F" }
+"OrgTagList" = { fg = "base0F" }
+
+# Blocks (#+BEGIN_SRC)
+"OrgBlockName"     = { fg = "base04" }
+"OrgBlockContents" = { fg = "base09" }
+
+# Lists and Checkboxes
+"OrgListBullet"      = { fg = "base09" }
+"OrgCheckbox"        = { fg = "base04" }
+"OrgCheckDone"       = { fg = "base0D", modifiers = ["bold"] } # Green X
+"OrgCheckInProgress" = { fg = "color_warn" }
+
+# Tables
+"OrgTableHorizontalRuler" = { fg = "base03" }
+"OrgCellNumber"           = { fg = "base0F" }
+"OrgCellFormula"          = { fg = "base0A" }
+
+# Footnotes
+"OrgFootnoteLabel"       = { fg = "base0F" }
+"OrgFootnoteDefinition"  = { fg = "base04" }
+
+
+[palette]
+base00 = "#161616" 
+base01 = "#262626" 
+base02 = "#393939" 
+base03 = "#525252" 
+base04 = "#dde1e6" 
+base05 = "#f2f4f8" 
+base06 = "#ffffff" 
+
+base07 = "#08bdba" 
+base08 = "#3ddbd9" 
+base09 = "#78a9ff"
+base0A = "#ee5296" 
+base0B = "#33b1ff" 
+base0C = "#ff7eb6" 
+base0D = "#42be65"
+base0E = "#be95ff" 
+base0F = "#82cfff" 
+
+
+color_error = "#fa4d56"
+color_warn = "#ff832b"
+color_add = "#42be65"
+color_new = "#33b1ff"
+
+#hgradient1 = "base0C"
+hgradient2 = "#ffafd2"
+hgradient3 = "#ffd6e8"
+hgradient4 = "#fff0f7"
+
+extra1 = "#fde695"

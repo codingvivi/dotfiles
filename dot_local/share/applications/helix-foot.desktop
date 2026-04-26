@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Helix (foot)
+GenericName=Text Editor
+Comment=Edit text files in Helix via foot terminal
+Exec=foot hx %F
+Terminal=false
+Type=Application
+Icon=helix
+Categories=Utility;TextEditor;
+StartupNotify=false
+MimeType=text/plain;

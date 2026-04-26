@@ -1,0 +1,14 @@
+
+[Unit]
+Description=Hyprland's idle manager
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment=WAYLAND_DISPLAY=wayland-0
+ExecStart=/usr/bin/hypridle
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,39 @@
+{{ if eq .chezmoi.osRelease.id "fedora" -}}
+monitorrule=name:eDP-1,width:3456,height:2234,refresh:120,x:0,y:10,scale:1.4
+{{ end -}}
+monitorrule=model:MAG321UX OLED,width:3840,height:2160,scale:1.0,refresh:240,vrr:0,x:0
+monitorrule=model:CX158,width:2880,height:1800,scale:1.25,refresh:100,vrr:0,x:3840
+#monitorrule=name:DP-2,width:1920,height:1080,scale:0.7
+
+
+# layout support:
+# tile,scroller,grid,deck,monocle,center_tile,vertical_tile,vertical_scroller
+tagrule=id:1,layout_name:scroller
+tagrule=id:2,layout_name:scroller
+tagrule=id:3,layout_name:scroller
+tagrule=id:4,layout_name:scroller
+tagrule=id:5,layout_name:scroller
+tagrule=id:6,layout_name:grid
+tagrule=id:7,layout_name:scroller
+tagrule=id:8,layout_name:grid
+tagrule=id:9,layout_name:scroller
+
+# layer rule
+layerrule=animation_type_open:zoom,layer_name:rofi
+layerrule=animation_type_close:zoom,layer_name:rofi
+
+# Force mpv to float, set its size, and position it in the bottom-right
+windowrule=width:640,height:360,isfloating:1,offsetx:74,offsety:77,appid:mpv
+
+windowrule=tags:7,appid:emacs,title:OrgAgendaFrame
+windowrule=isnamedscratchpad:1,width:1280,height:900,appid:emacs,title:OrgDailyFrame
+
+#windowrule=width:640,height:360,isfloating:1,appid:yesplaymusic
+
+windowrule=isnamedscratchpad:1,width:1280,height:1000,appid:levelsterm
+windowrule=isnamedscratchpad:1,width:900,height:900,appid:nwctlterm
+windowrule=isnamedscratchpad:1,width:1280,height:1000,appid:wifictlterm
+windowrule=isnamedscratchpad:1,width:1280,height:1000,appid:btctlterm
+windowrule=isnamedscratchpad:1,width:1280,height:1000,appid:levelsterm
+windowrule=isnamedscratchpad:1,width:1280,height:1000,appid:musicterm
+windowrule=isnamedscratchpad:1,width:1280,height:720,appid:pomoterm

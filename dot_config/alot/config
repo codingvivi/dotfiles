@@ -1,0 +1,7 @@
+[buffer_defaults]
+  [[thread]]
+    auto_view_mime_types = text/html, text/calendar
+
+[bindings]
+  [[thread]]
+    O = pipeto --format=raw --background open-in-browser

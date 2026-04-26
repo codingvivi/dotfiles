@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "determining distro..."
+
+{{- $id := .chezmoi.osRelease.id -}}
+{{- if eq $id "" -}}{{- $id = .chezmoi.os -}}{{- end -}}
+{{- $matched := false -}}
+{{- range $name, $sys := .systems -}}
+{{- if has $id $sys.ids }}
+command -v nu &>/dev/null || {{ join " " $sys.install }} nushell
+{{- $matched = true -}}
+{{- end -}}
+{{- end }}
+{{ if not $matched -}}
+echo "Unsupported distro: {{ $id }}" >&2
+exit 1
+{{- end }}
+
+echo "detected distro: {{ $id }}"

@@ -1,0 +1,17 @@
+#!/usr/bin/env nu
+
+print "setting up emacs..."
+# ── emacs ──────────────────────────────────────────────────────────────────────
+# Remove distro-placed ~/.emacs skeleton that shadows ~/.config/emacs/init.el
+
+print "removing any unwanted emacs directories. we only do .config/ in this household"
+[$"($env.HOME)/.emacs" $"($env.HOME)/.emacs.d"] | each {|path|
+    if ($path | path exists) {
+        rm -rf $path
+        print $"removed ($path)"
+    } else {
+        print $"($path) not found, skipping"
+    }
+}
+
+print "emacs setup done"

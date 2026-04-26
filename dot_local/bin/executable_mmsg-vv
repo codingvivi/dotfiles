@@ -1,0 +1,35 @@
+#!/usr/bin/env -S nu --no-std-lib
+
+def main [] {
+  help binds
+}
+
+def "main mode switch" [mode:string] {
+  let lastmode = (mmsg -b | split words | last)
+  mmsg -d $"setkeymode,($mode)"
+  #notify-send -c "wm-mode" -t 700 $mode -h string:x-canonical-private-synchronous:wm-mode
+  notify-send -c "wm-mode" $mode -h string:x-canonical-private-synchronous:wm-mode
+  match [$lastmode $mode] {
+    ["default" "default"] => {}
+    ["default" _ ] => { mmsg -d toggle_render_border }
+    [_ "default"] => { mmsg -d toggle_render_border; sleep 700ms; makoctl dismiss -a}
+    [_ _] => {}
+  }
+}
+
+def "main dispatch-and-switch" [cmd:string, mode:string] {
+  # nu serializes script args containing spaces as nuon ("..." with \" escapes); reverse it
+  let cmd = (try { $cmd | from nuon } catch { $cmd })
+  mmsg -d $cmd
+  main mode switch $mode
+}
+
+def "main spawn-floating" [cmd: string, mode: string = "default"] {
+  mmsg -d $"spawn,($cmd)"
+  mmsg -d toggle_floating
+  main mode switch $mode
+}
+
+# def "main focus-or-open" [] {
+#
+# }

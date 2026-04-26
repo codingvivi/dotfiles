@@ -1,0 +1,191 @@
+# Package list consumed by run_once_03-install-packages.nu.tmpl
+#
+# SYNTAX
+# ──────
+# Plain string → install via system pkg manager, checked with `rpm -q <name>`, on all distros:
+#   - somepackage
+#
+# Named record (any fields below are optional):
+#   - name: somepackage       # package name (required)
+#     via: pkg                # installer: pkg | cargo | uv | go | mise  (default: pkg)
+#     check: somebinary       # override the binary/pkg used to check if already installed
+#     pkg: other-pkg-name     # override the package name passed to the installer
+#     bin: somebinary         # alias for check
+#     args: [...]             # extra args passed to the installer command
+#     repo: "https://..."     # add this repo before installing (zypper/dnf)
+#
+# Distro overrides — add an `opensuse:` or `fedora:` block to merge/override top-level fields:
+#   - name: somepackage
+#     via: cargo
+#     opensuse:
+#       via: pkg              # use pkg on opensuse, cargo on everything else
+#
+# Special values for `install:` inside a distro block:
+#   install: exclusive        # only install on distros that also have install: exclusive
+#   install: ignore           # skip on this distro
+#   install: include          # opt back in on a distro whose system has
+#                             # exclude_by_default = true (see systems.toml)
+#
+packages:
+  # ── terminal ──────────────────────────────────────────────────────────────────
+  - foot
+  - atuin
+  - zoxide
+  - fira-code-fonts
+  - name: tlrc
+    bin: tldr
+    fedora:
+        check: which
+  - name: ripgrep
+    cmd: rg
+  # ── shell ─────────────────────────────────────────────────────────────────────
+  - fish
+  # ── editors ───────────────────────────────────────────────────────────────────
+  - name: helix
+    macos:
+      install: include
+  - emacs
+  # ── editor tools ──────────────────────────────────────────────────────────────
+  - name: hx-lsp
+    via: cargo
+  - taplo
+  # - markdown-oxide
+  # - clangd
+  - name: jujutsu
+    check: jj
+
+  # ── bar / notifications / idle ────────────────────────────────────────────────
+  - name: waybar
+    fedora:
+      install: ignore
+  - mako
+  - name: libnotify
+    check: notify-send
+  - hypridle
+  - wlopm
+
+  # ── screen ────────────────────────────────────────────────────────────────
+  - brightnessctl
+  - grim
+  - slurp
+
+  # ── clipboard ─────────────────────────────────────────────────────────────────
+  - cliphist
+  - wl-clipboard
+  # - name: wl-clip-persist
+  #   via: cargo
+  - name: pass
+    opensuse:
+      pkg: password-store
+    macos:
+      install: include
+
+  # ── launcher ──────────────────────────────────────────────────────────────────
+  # - rofi
+
+  # ── file managers ─────────────────────────────────────────────────────────────
+  - feh
+  - name: yazi
+    via: cargo
+    opensuse:
+      via: pkg
+  - name: broot
+    via: cargo
+    opensuse:
+      via: pkg
+
+  - name: syncthing
+    macos:
+      install: include 
+  # ── file viewers ──────────────────────────────────────────────────────────────
+  - zathura
+  - name: zathura-plugin-pdf-mupdf
+    opensuse:
+      install: exclusive
+  - name: zathura-plugins-all
+    fedora:
+      install: exclusive
+
+  # ── audio ────────────────────────────────────────────────────────────────────
+  - pipewire
+  - pipewire-pulseaudio
+  - wireplumber
+  - name: pipewire-devel
+    opensuse:
+      install: exclusive
+  - name: wiremix
+    via: cargo
+    fedora:
+      via: pkg
+
+  # ── music ─────────────────────────────────────────────────────────────────────
+  - mpd
+  - name: beets
+    via: uv
+    args: ["beets[autobpm,chroma]"]
+  - chromaprint-fpcalc  
+  - name: rmpc
+    via: cargo
+    args: ["--git", "https://github.com/mierak/rmpc"]
+  # ── media ─────────────────────────────────────────────────────────────────────
+  - yt-dlp
+  - mpv
+  # ── email ─────────────────────────────────────────────────────────────────────
+  - gpgme-devel
+  - isync
+  - notmuch
+  - name: alot
+    via: uv
+    fedora:
+      via: pkg
+
+  # ── browser ───────────────────────────────────────────────────────────────────
+  - qutebrowser
+
+  # ── wallpaper ─────────────────────────────────────────────────────────────────
+  - name: awww
+    opensuse:
+      install: exclusive
+
+  # ── compositor ────────────────────────────────────────────────────────────────
+  - name: mangowc-git
+    opensuse:
+      install: exclusive
+      repo: "https://download.opensuse.org/repositories/home:darix:playground/openSUSE_Tumbleweed/home:darix:playground.repo"
+
+  # ── lock screen ───────────────────────────────────────────────────────────────
+  - name: swaylock-effects
+    opensuse:
+      install: exclusive
+      repo: "https://download.opensuse.org/repositories/home:mantarimay:sway/standard/home:mantarimay:sway.repo"
+
+  # ── bluetooth ─────────────────────────────────────────────────────────────────
+  - name: bluez
+    opensuse:
+      install: exclusive
+
+  # ── comms ─────────────────────────────────────────────────────────────────────
+  - name: iamb
+    via: cargo
+
+  # ── keyboard ──────────────────────────────────────────────────────────────────
+  - name: kanata
+    via: cargo
+
+  # ── toolchains ────────────────────────────────────────────────────────────────
+  - name: cargo-update
+    via: cargo
+  # ── dev tools ─────────────────────────────────────────────────────────────────
+  - name: ghq
+    via: mise
+    args: ["ghq@latest"]
+  - name: pomo
+    via: go
+    args: ["codeberg.org/kevinschoon/pomo/cmd/pomo@latest"]
+  - name: pomodoro
+    via: cargo
+    args: ["--locked rust-cli-pomodoro"]
+  - name: wifitui
+    via: go
+    args: ["github.com/shazow/wifitui@latest"]
+    

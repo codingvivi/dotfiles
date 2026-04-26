@@ -1,0 +1,23 @@
+#!/usr/bin/env -S nu --no-std-lib
+
+def last-id [] {
+  let notifs = (^makoctl list -j | from json)
+  let filtered = ($notifs | where category != "wm-mode")
+  if ($filtered | is-empty) { null } else { $filtered.0.id }
+}
+
+def main [] {
+  help binds
+}
+
+def "main dismiss" [] {
+  let id = (last-id)
+  if $id == null { return }
+  ^makoctl dismiss -n $id
+}
+
+def "main invoke" [] {
+  let id = (last-id)
+  if $id == null { return }
+  ^makoctl invoke -n $id
+}

@@ -1,0 +1,16 @@
+.config/nushell/history.txt
+README.md
+{{ $id := .chezmoi.osRelease.id -}}
+{{ if eq $id "" }}{{ $id = .chezmoi.os }}{{ end -}}
+{{ if eq $id "darwin" -}}
+{{ include ".chezmoiignore_darwin" }}
+{{- else -}}
+{{ range $name, $sys := .systems -}}
+{{ if has $id $sys.ids -}}
+{{ if hasKey $sys "ignore" -}}
+{{ range $sys.ignore }}{{ . }}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- end }}

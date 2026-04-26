@@ -1,0 +1,23 @@
+#!/usr/bin/env nu
+
+let version = "0.1.60a"
+let arch = match "{{ .chezmoi.arch }}" {
+    "amd64" => "x86_64"
+    "arm64" => "aarch64"
+    _ => { error make {msg: $"unsupported arch: {{ .chezmoi.arch }}"} }
+}
+let url = $"https://github.com/glide-browser/glide/releases/download/($version)/glide.linux-($arch).tar.xz"
+let dest = ($env.HOME | path join .local/opt/glide)
+let stamp = ($dest | path join .glide-version)
+
+if ($stamp | path exists) and (open $stamp | str trim) == $version {
+    print $"glide ($version) already installed at ($dest), skipping"
+    exit 0
+}
+
+print $"installing glide ($version) to ($dest)..."
+rm -rf $dest
+mkdir $dest
+http get --raw $url | tar -xJ --strip-components=1 -C $dest
+$version | save -f $stamp
+print "glide install done"

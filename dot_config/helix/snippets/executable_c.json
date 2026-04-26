@@ -1,0 +1,25 @@
+{
+  "42_proj_ft": {
+    "prefix": ["42ft"],
+    "body": [
+      "${1:void}\t\tft_${2:name}(${3:void});",
+      "",
+      "int\t\t\tmain(void)",
+      "{",
+      "\t// $3$0",
+      "\t// ft_$2();",
+      "",
+      "\treturn (0);",
+      "}",
+      "$1\tft_$2($3)",
+      "{",
+      "}"
+	  ],
+    "description": "Template for the 42 school function exercises"
+  }
+  "block-comment-inline" : {
+    "prefix": ["block-comment-inline"]
+    "body": ["/* $1 */"]
+  }
+}
+

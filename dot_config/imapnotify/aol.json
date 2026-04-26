@@ -1,0 +1,10 @@
+{
+  "host": "imap.aol.com",
+  "port": 993,
+  "tls": true,
+  "username": "liza.rain@aol.com",
+  "passwordCmd": "grep '^app-tw-fw25:' /run/user/1000/secrets/email-aol | cut -d' ' -f2",
+  "boxes": ["INBOX"],
+  "onNewMail": "mbsync aol-sync",
+  "onNewMailPost": "notmuch new"
+}

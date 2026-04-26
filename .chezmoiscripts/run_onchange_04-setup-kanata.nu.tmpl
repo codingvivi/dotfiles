@@ -1,0 +1,57 @@
+#!/usr/bin/env nu
+
+print "setting up kanata..."
+
+# ── kanata ─────────────────────────────────────────────────────────────────────
+
+{{ if eq .chezmoi.osRelease.id "opensuse-tumbleweed" "opensuse-leap" "opensuse" -}}
+# symlink cargo-installed kanata into /usr/local/bin so the sandboxed service can reach it
+let cargo_bin = $"($env.HOME)/.cargo/bin/kanata"
+
+
+print "assuring kanata binary accessible to system..."
+
+match [($cargo_bin | path exists) ("/usr/local/bin/kanata" | path exists)] {
+    [true false] => { sudo cp -v $cargo_bin /usr/local/bin/kanata;}
+    [false false] => { print "warning: kanata not found in ~/.cargo/bin, skipping" }
+    [false true] => { print "cargo kanata already copied, skipping" }
+    _ => {}
+}
+
+{{ end -}}
+
+print "kanata binary is where it should be!"
+
+# ── kanata user / system setup ──────────────────────────────────────────────
+
+# ensure uinput group exists (may not be present by default)
+if (^getent group uinput | complete).exit_code != 0 {
+    sudo groupadd uinput
+} else { print "ugroup exists, skipping creation"}
+
+if (^id kanata-user | complete).exit_code != 0 {
+
+    print "installing kanata.service..."
+    sudo mkdir -p /etc/systemd/system
+    chezmoi execute-template $"{{ .chezmoi.sourceDir }}/.chezmoitemplates/kanata.service" | sudo tee /etc/systemd/system/kanata.service | ignore
+
+    print "setting up kanata user..."
+
+
+    # dedicated system user with no login shell
+    sudo useradd -r -s /sbin/nologin kanata-user
+    sudo usermod -aG input,uinput kanata-user
+
+    # load uinput now and persist across reboots
+    "uinput" | sudo tee /etc/modules-load.d/uinput.conf
+    sudo modprobe uinput
+
+    # allow uinput group to access /dev/uinput
+    'KERNEL=="uinput", GROUP="uinput", MODE="0660"' | sudo tee /etc/udev/rules.d/99-uinput.rules
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
+
+    sudo systemctl daemon-reload
+} else { print "kanata-user already exists, skipping user setup" }
+
+print "kanata set up!"

@@ -1,0 +1,16 @@
+#!/usr/bin/env -S nu --stdin
+
+print "Updating rust"
+try { rustup update }
+
+print "Updating cargo packages"
+try { cargo install-update --all }
+
+print "Updating python tools"
+try { uv tool upgrade --all }
+
+print "Updating mise packages"
+try { mise upgrade }
+
+print "Updating external files"
+try { chezmoi apply --refresh-externals }

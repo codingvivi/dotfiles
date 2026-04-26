@@ -1,0 +1,18 @@
+inherits = "vivicarbon"
+
+ "ui.background" = {}
+ui.window = {fg = "", bg = ""}
+ #"ui.background.separator" = {}
+
+
+"ui.popup.info" = { fg= "base09"}
+ui.linenr = { fg = "base03", bg = "" }
+# "ui.separator" = {fg = "#161616"}
+"ui.statusline" = { fg = "base06", bg = "" }
+
+"diagnostic.hint" = { fg = "base0D", underline = { color = "base0D", style = "curl"} }
+"diagnostic.info" = { fg = "base0B", underline = { color = "base0B", style = "curl"} }
+"diagnostic.warning" = { fg = "#ff832b", underline = { color = "", style = "curl"} }
+"diagnostic.error" = { fg = "#fa4d56", underline = { color = "#fa4d56", style = "curl"} }
+"diagnostic.unnecessary" = { fg = "base0B", underline = { color = "base0B", style = "curl"} }
+"diagnostic.deprecated" = { fg = "ff832b", underline = { color = "#ff832b", style = "curl"} }

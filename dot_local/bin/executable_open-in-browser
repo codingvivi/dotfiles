@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+import sys
+import email
+import tempfile
+import subprocess
+import base64
+import re
+
+msg = email.message_from_bytes(sys.stdin.buffer.read())
+
+# Collect inline images by Content-ID
+cid_map = {}
+for part in msg.walk():
+    cid = part.get("Content-ID", "").strip("<>")
+    if cid and part.get_content_maintype() == "image":
+        data = part.get_payload(decode=True)
+        mime = part.get_content_type()
+        cid_map[cid] = f"data:{mime};base64,{base64.b64encode(data).decode()}"
+
+html = None
+for part in msg.walk():
+    if part.get_content_type() == "text/html":
+        html = part.get_payload(decode=True)
+        charset = part.get_content_charset() or "utf-8"
+        html = html.decode(charset, errors="replace")
+        break
+
+if html:
+    # Replace cid: references with base64 data URIs
+    for cid, data_uri in cid_map.items():
+        html = html.replace(f"cid:{cid}", data_uri)
+
+    f = tempfile.NamedTemporaryFile(suffix=".html", prefix="alot-", dir="/tmp", delete=False, mode="w")
+    f.write(html)
+    f.close()
+    subprocess.Popen(["qutebrowser", f.name])
