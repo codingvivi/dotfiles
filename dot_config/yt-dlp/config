@@ -1,0 +1,3 @@
+# yt-dlp configuration
+# Pull cookies straight from qutebrowser's QtWebEngine profile (Chromium format)
+--cookies-from-browser chromium:/home/musicvivireal/.local/share/qutebrowser

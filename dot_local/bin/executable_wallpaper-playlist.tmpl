@@ -24,10 +24,9 @@ export def "main next" [] {
 
 
     # if path exists otherwise init -1 which turns to 0
-    let last_idx = if ($state_file | path exists) { 
-        open $state_file | into int 
-    } else { 
-        -1 
+    let last_idx = match ($state_file | path exists) {
+        true => (try { open $state_file | str trim | into int } catch { -1 })
+        false => -1
     }
 
     #mod will return 0 once max index reached

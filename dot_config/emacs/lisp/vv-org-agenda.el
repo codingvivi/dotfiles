@@ -33,8 +33,20 @@
          ((org-agenda-sorting-strategy '(priority-down))))
 
         ("t" "Tracks"
-         ((tags-todo "get|recdigging")
-          (tags-todo "dig|recgetting"))
+         ((tags-todo "get-st-CC-HSA-idElectro-idTrap-idLDnB|recdigging-st-CC-HSA-idElectro-idTrap-idLDnB|id-st-CC-HSA-idElectro-idTrap-idLDnB")
+          (tags-todo "dig-st-CC-HSA-idElectro-idTrap-idLDnB|recgetting-st-CC-HSA-idElectro-idTrap-idLDnB")
+          (tags-todo "get&st|recdigging&st|id&st")
+          (tags-todo "get&CC|recdigging&CC|id&CC")
+          (tags-todo "get&HSA|recdigging&HSA|id&HSA")
+          (tags-todo "get&idElectro|recdigging&idElectro|id&idElectro")
+          (tags-todo "get&idTrap|recdigging&idTrap|id&idTrap")
+          (tags-todo "get&idLDnB|recdigging&idLDnB|id&idLDnB")
+          (tags-todo "dig&st|recgetting&st")
+          (tags-todo "dig&CC|recgetting&CC")
+          (tags-todo "dig&HSA|recgetting&HSA")
+          (tags-todo "dig&idElectro|recgetting&idElectro")
+          (tags-todo "dig&idTrap|recgetting&idTrap")
+          (tags-todo "dig&idLDnB|recgetting&idLDnB"))
          ((org-agenda-sorting-strategy '(priority-down))))
 
         ("g" "girlfriemd....."

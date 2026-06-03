@@ -57,6 +57,8 @@ alias kp='flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC'
 
 eval "$(fnm env --use-on-cd --shell bash)"
 export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$PATH:$HOME/.nimble/bin"
 export MANPATH="/usr/local/share/man:$(manpath)" 
 
 source "$HOME/.config/broot/launcher/bash/br"
+. "/home/musicvivireal/.deno/env"
