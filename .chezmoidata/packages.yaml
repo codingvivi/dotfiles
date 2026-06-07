@@ -48,7 +48,10 @@ packages:
   # ── editor tools ──────────────────────────────────────────────────────────────
   - name: hx-lsp
     via: cargo
-  - taplo
+  - name: taplo
+    fedora:
+      via: cargo
+      args: ["--features", "lsp", "taplo-cli"]
   # - markdown-oxide
   # - clangd
   - name: jujutsu
@@ -123,7 +126,11 @@ packages:
   - name: beets
     via: uv
     args: ["beets[autobpm,chroma]"]
-  - chromaprint-fpcalc  
+  - name: chromaprint-fpcalc
+    check: which
+    bin: fpcalc
+    fedora:
+      pkg: chromaprint-tools
   - name: rmpc
     via: cargo
     args: ["--git", "https://github.com/mierak/rmpc"]
@@ -144,8 +151,6 @@ packages:
 
   # ── wallpaper ─────────────────────────────────────────────────────────────────
   - name: awww
-    opensuse:
-      install: exclusive
 
   # ── compositor ────────────────────────────────────────────────────────────────
   - name: mangowc-git
@@ -175,6 +180,7 @@ packages:
   # ── toolchains ────────────────────────────────────────────────────────────────
   - name: cargo-update
     via: cargo
+    bin: cargo-install-update
   # ── dev tools ─────────────────────────────────────────────────────────────────
   - name: ghq
     via: mise
@@ -184,7 +190,7 @@ packages:
     args: ["codeberg.org/kevinschoon/pomo/cmd/pomo@latest"]
   - name: pomodoro
     via: cargo
-    args: ["--locked rust-cli-pomodoro"]
+    args: ["--locked", "rust-cli-pomodoro"]
   - name: wifitui
     via: go
     args: ["github.com/shazow/wifitui@latest"]

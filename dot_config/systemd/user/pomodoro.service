@@ -1,11 +1,17 @@
 [Unit]
-Description=Rust CLI Pomodoro Timer
+Description=Rust CLI Pomodoro Timer (headless server)
 PartOf=graphical-session.target
 After=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
-ExecStart=%h/.cargo/bin/pomodoro --config %h/.config/rust-cli-pomodoro/configuration.json
+# pomodoro with no subcommand runs an interactive REPL that also serves the
+# UDS the client subcommands (create/list/...) talk to. Under systemd stdin is
+# /dev/null, so it would hit EOF and exit immediately; `tail -f /dev/null` holds
+# stdin open to keep the server alive. We use sh -c because of the pipe.
+ExecStart=/usr/bin/sh -c "tail -f /dev/null | %h/.cargo/bin/pomodoro --config %h/.config/rust-cli-pomodoro/configuration.json"
 Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=graphical-session.target
