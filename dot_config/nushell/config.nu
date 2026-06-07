@@ -53,6 +53,11 @@ alias gognl = cd ($env.HOME | path join 'src/github.com/codingvivi/42_get_next_l
 alias keepassxc-cli = flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC
 alias kp = flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC
 
+# pomodoro: `timer 25` -> work 25m, no break. (-b 0 leads so the trailing arg fills -w)
+alias timer = pomodoro create -b 0 -w
+# `pom 25 5` -> work 25m, break 5m. (def, since the args sit between flags)
+def pom [work: int, brk: int] { pomodoro create -w $work -b $brk }
+
 #alias ghq = mise use ghq
 
 def --env y [...args] {
