@@ -3,7 +3,7 @@ export def main [] {
 }
 
 export def "activate mise" [] {
- mise activate nu | save -f $"($env.local-autoload-dir)/mise.nu"
+ mise activate nu | str replace -a "str upcase" "str uppercase" | save -f $"($env.local-autoload-dir)/mise.nu"
 }
 
 export def --wrapped "activate zoxide" [...rest] {

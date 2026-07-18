@@ -16,8 +16,8 @@ prepend_rules = [
 
 [plugin]
 prepend_preloaders = [
-	{ name = "*.cb[7rz]", run = "comicthumb" },
+	{ url = "*.cb[7rz]", run = "comicthumb" },
 ]
 prepend_previewers = [
-	{ name = "*.cb[7rz]", run = "comicthumb" },
+	{ url = "*.cb[7rz]", run = "comicthumb" },
 ]
