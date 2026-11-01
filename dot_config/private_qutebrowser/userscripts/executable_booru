@@ -1,0 +1,56 @@
+#!/usr/bin/env nu
+# qutebrowser userscript: send media to the oxibooru on vivivault via booru-up
+#
+#   spawn --userscript booru {url}
+#       the whole page, fetched with gallery-dl (original files from twitter,
+#       pixiv, boorus, ...), with the page as source
+#   hint images spawn --userscript booru {hint-url} {url}
+#       one image, with the page as source
+
+source ~/.config/nushell/autoload/booru.nu
+
+# Cap for page mode, so a profile or search page doesn't upload thousands of files
+const MAX_FILES = 30
+
+def qute [cmd: string] {
+    if ($env.QUTE_FIFO? | is-not-empty) { $"($cmd)\n" | save --append $env.QUTE_FIFO } else { print $cmd }
+}
+
+# Twitter thumbnails come in small/medium sizes; ask for the original
+def original-url [url: string] {
+    if ($url | str contains 'pbs.twimg.com/media/') {
+        $url | str replace -r 'name=[^&]+' 'name=orig'
+    } else { $url }
+}
+
+def main [url: string, source?: string] {
+    let dir = (mktemp -d -t qute-booru.XXXXXX)
+    try {
+        let targets = if $source == null {
+            qute $"message-info booru: fetching ($url)"
+            let r = (^gallery-dl --range $"1-($MAX_FILES)" -D $dir $url | complete)
+            if (ls $dir | is-empty) {
+                let why = ($r.stderr | str trim | lines | last 1 | str join)
+                error make {msg: $"gallery-dl got nothing: ($why)"}
+            }
+            [$dir]
+        } else {
+            let file = ($dir | path join image)
+            let r = (^curl -fsSL -A 'Mozilla/5.0' -e $source -o $file (original-url $url) | complete)
+            if $r.exit_code != 0 { error make {msg: $"download failed: ($r.stderr | str trim)"} }
+            [$file]
+        }
+        let res = (booru-up ...$targets --delete --source ($source | default $url))
+        let count = {|s| $res | where status == $s | length }
+        let summary = $"booru: (do $count uploaded) uploaded, (do $count duplicate) duplicate"
+        let failed = ($res | where status == failed)
+        if ($failed | is-empty) {
+            qute $"message-info ($summary)"
+        } else {
+            qute $"message-error ($summary), ($failed | length) failed: ($failed.0.error)"
+        }
+    } catch {|e|
+        qute $"message-error booru: ($e.msg)"
+    }
+    rm -rf $dir
+}

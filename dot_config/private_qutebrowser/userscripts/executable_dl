@@ -1,0 +1,28 @@
+#!/usr/bin/env nu
+# qutebrowser userscript: download a url with yt-dlp or gallery-dl
+#
+#   spawn --userscript dl video {url}     -> ~/Videos/yt-dlp
+#   spawn --userscript dl gallery {url}   -> ~/Pictures/gallery-dl/<site>/<user>/...
+
+def qute [cmd: string] {
+    if ($env.QUTE_FIFO? | is-not-empty) { $"($cmd)\n" | save --append $env.QUTE_FIFO } else { print $cmd }
+}
+
+def main [kind: string, url: string] {
+    let video_dir = ($env.HOME | path join Videos/yt-dlp)
+    let gallery_dir = ($env.HOME | path join Pictures/gallery-dl)
+    let cmd = match $kind {
+        # --no-playlist: a video opened from a playlist means just that video
+        video => [yt-dlp --no-playlist --embed-metadata -o $"($video_dir)/%\(title\).150B [%\(id\)s].%\(ext\)s" $url]
+        gallery => [gallery-dl -d $gallery_dir $url]
+        _ => { qute $"message-error dl: unknown kind '($kind)'"; return }
+    }
+    qute $"message-info ($cmd.0): fetching ($url)"
+    let r = (run-external ...$cmd | complete)
+    if $r.exit_code == 0 {
+        qute $"message-info ($cmd.0): done ($url)"
+    } else {
+        let why = ($r.stderr | str trim | lines | last 1 | str join)
+        qute $"message-error ($cmd.0): ($why)"
+    }
+}

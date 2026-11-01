@@ -11,8 +11,18 @@ config.bind("l", "tab-next", mode="normal")
 config.bind("ge", "scroll-to-perc 100", mode="normal")
 config.unbind("G", mode="normal")
 
+# Media (userscripts in ./userscripts; booru uploads go through booru-up)
+# , acts on the current page
+config.bind(",b", "spawn --userscript booru {url}")
+config.bind(",y", "spawn --userscript dl video {url}")
+config.bind(",g", "spawn --userscript dl gallery {url}")
+# ; picks with hints
+config.bind(";B", "hint images spawn --userscript booru {hint-url} {url}")
+config.bind(";V", "hint links spawn --userscript dl video {hint-url}")
+config.bind(";g", "hint links spawn --userscript dl gallery {hint-url}")
+
 c.url.searchengines = {
-    "DEFAULT": "https://google.com/search?hl=en&q={}",
+    "DEFAULT": "https://kagi.com/search?q={}",
     "!a": "https://www.amazon.com/s?k={}",
     "!d": "https://duckduckgo.com/?ia=web&q={}",
     "!dd": "https://thefreedictionary.com/{}",
