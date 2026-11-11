@@ -22,6 +22,7 @@ use std/util "path add"
 path add ($env.GOBIN)
 path add ($env.HOMEBREW_PREFIX | path join "bin")
 path add ($env.HOMEBREW_PREFIX | path join "sbin")
+path add ($env.HOME | path join ".nimble/bin")
 
 #$env.MANPATH = ($env.MANPATH? | default [] | append '/home/linuxbrew/.linuxbrew/share/man' | uniq)
 #$env.INFOPATH = ($env.INFOPATH? | default [] | append '/home/linuxbrew/.linuxbrew/share/info' | uniq)

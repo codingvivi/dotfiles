@@ -126,6 +126,11 @@ formatter = {command = "nufmt", args = ["--stdin"]}
 command = "nu"
 args = ["--lsp"]
 
+[[language]]
+name = "nim"
+formatter = { command = "nph", args = ["-"] }
+auto-format = true
+
 
 
 # write logs to /tmp/completion.log

@@ -10,6 +10,7 @@ color-modes = true # Whether to color the mode indicator with different colors d
 auto-format = true
 #clipboard-provider = "pasteboard"
 completion-timeout = 5
+end-of-line-diagnostics = "disable"
 
 [editor.soft-wrap]
 enable = true
@@ -32,8 +33,9 @@ hidden = false
 git-ignore = true
 
 [editor.inline-diagnostics]
-cursor-line = "disable"
-other-lines = "disable"
+cursor-line = "hint"    # full detail on the line the cursor is on
+other-lines = "disable" # elsewhere, the end-of-line marker is enough
+max-diagnostics = 3     # cap the stack when one line has many problems
 
 [editor.statusline]
 left = ["mode", "file-type", "file-base-name", "version-control"]
