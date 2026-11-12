@@ -3,8 +3,38 @@
 (setq org-agenda-skip-deadline-if-done t)
 (setq org-agenda-span 'month)
 
+;; Effort shows up in column view and agenda (C-c C-x e to set)
+(setq org-global-properties
+      '(("Effort_ALL" . "0:15 0:30 1:00 1:30 2:00 3:00 4:00 6:00")))
+(setq org-columns-default-format "%50ITEM %TODO %PRIORITY %TAGS %Effort{:}")
+
+;; a PROJ is stuck when it has no TODO/STRT child: nothing to do next
+(setq org-stuck-projects '("/PROJ" ("TODO" "STRT") nil ""))
+
 (setq org-agenda-custom-commands
-      '(("p" "Personal"
+      '(("f" . "Focus (by energy)")
+        ("fu" "Ugh: dreaded tasks, for the vyvanse window"
+         ((tags-todo "ugh"))
+         ((org-agenda-sorting-strategy '(priority-down effort-up))))
+        ("fd" "Deep work"
+         ((tags-todo "+deep-ugh"))
+         ((org-agenda-sorting-strategy '(priority-down effort-up))))
+        ("fs" "Shallow: cooked mode"
+         ((tags-todo "+shallow-ugh"))
+         ((org-agenda-sorting-strategy '(priority-down effort-up))))
+        ("fc" "Chill: recharge"
+         ((tags-todo "chill"))
+         ((org-agenda-sorting-strategy '(priority-down))))
+        ("fn" "Untagged: needs deep/shallow tag"
+         ((tags-todo "-deep-shallow"))
+         ((org-agenda-sorting-strategy '(priority-down))))
+
+        ("P" "Projects overview"
+         ((todo "PROJ")
+          (stuck ""))
+         ((org-agenda-sorting-strategy '(priority-down))))
+
+        ("p" "Personal"
          ((tags-todo "productivity")
           (tags-todo "+musicwork-tracks")) ; without tags
          ((org-agenda-sorting-strategy '(priority-down))))

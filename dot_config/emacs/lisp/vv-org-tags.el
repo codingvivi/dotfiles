@@ -1,7 +1,21 @@
 ;;; vv-org-tags.el --- Org tag hierarchy
 
 (setq org-tag-alist
-      '(;; groups
+      '(;; task traits (mutually exclusive pairs: picking one removes the other)
+        ;; brain needed
+        (:startgroup)
+        ("deep" . ?D)
+        ("shallow" . ?S)
+        (:endgroup)
+        ;; work vs recharge
+        (:startgroup)
+        ("grind" . ?G)
+        ("chill" . ?C)
+        (:endgroup)
+        ;; aversion: only on tasks I dread
+        ("ugh" . ?U)
+
+        ;; groups
         (:startgrouptag)
         ("work")
         (:grouptags)

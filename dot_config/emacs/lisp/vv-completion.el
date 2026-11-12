@@ -16,6 +16,17 @@
   :init
   (savehist-mode))
 
+;; In-buffer completion popup. Org's built-in capf already completes tags
+;; (from `org-tag-alist' + tags in the buffer) after a `:' on a headline,
+;; so corfu-auto just needs to be on in org buffers.
+(use-package corfu
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 1)
+  (corfu-cycle t)
+  :hook (org-mode . corfu-mode))
+
 (use-package emacs
   :custom
   (context-menu-mode t)
