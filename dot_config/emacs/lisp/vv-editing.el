@@ -1,4 +1,4 @@
-;;; vv-editing.el --- Theme and modal editing
+;;; vv-editing.el --- Theme and modal editing  -*- lexical-binding: t; -*-
 
 
 ; (use-package meow

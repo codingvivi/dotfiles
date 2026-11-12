@@ -1,4 +1,4 @@
-;;; vv-completion.el --- Completion framework
+;;; vv-completion.el --- Completion framework  -*- lexical-binding: t; -*-
 
 (use-package vertico
   :custom

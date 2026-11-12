@@ -1,4 +1,4 @@
-;;; vv-org-roam.el --- Org-roam configuration
+;;; vv-org-roam.el --- Org-roam configuration  -*- lexical-binding: t; -*-
 
 (use-package org-roam
   :after org

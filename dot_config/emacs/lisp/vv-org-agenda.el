@@ -1,3 +1,5 @@
+;;; vv-org-agenda.el --- Org agenda configuration  -*- lexical-binding: t; -*-
+
 (setq org-agenda-window-setup 'only-window)
 (setq org-agenda-skip-scheduled-if-done t)
 (setq org-agenda-skip-deadline-if-done t)

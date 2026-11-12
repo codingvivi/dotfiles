@@ -1,4 +1,3 @@
-
 ;;; oxocarbon-theme.el --- -*- lexical-binding: t; -*-
 
 ;; Package-Requires: ((emacs "29"))

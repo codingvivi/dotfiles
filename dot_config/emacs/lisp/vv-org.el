@@ -1,4 +1,4 @@
-;;; vv-org.el --- Core org configuration
+;;; vv-org.el --- Core org configuration  -*- lexical-binding: t; -*-
 
 ;;; --- Org Mode Aliases ---
 
@@ -29,8 +29,10 @@
 
 (use-package org
   :config
+  (setq org-directory (expand-file-name "Documents/org" "~"))
+
   (setq org-agenda-files
-        (directory-files-recursively (expand-file-name "Documents/org" "~") "\\`[^.#].*\\.org\\'"))
+        (directory-files-recursively org-directory "\\`[^.#].*\\.org\\'"))
 
   (setq org-log-done 'time)
 

@@ -1,4 +1,4 @@
-;;; vv-tools.el --- External tools and utilities
+;;; vv-tools.el --- External tools and utilities  -*- lexical-binding: t; -*-
 
 (use-package exec-path-from-shell
   :ensure t

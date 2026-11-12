@@ -1,4 +1,4 @@
-;;; vv-org-tags.el --- Org tag hierarchy
+;;; vv-org-tags.el --- Org tag hierarchy  -*- lexical-binding: t; -*-
 
 (setq org-tag-alist
       '(;; task traits (mutually exclusive pairs: picking one removes the other)

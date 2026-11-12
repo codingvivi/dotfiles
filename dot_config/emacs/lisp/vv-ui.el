@@ -1,4 +1,4 @@
-;;; vv-ui.el --- UI & appearance settings
+;;; vv-ui.el --- UI & appearance settings  -*- lexical-binding: t; -*-
 
 (when (fboundp 'which-key-mode) (which-key-mode))
 
