@@ -191,6 +191,18 @@
         ("berlin")
         ("stuttgart")
         ("fhafen")
+        (:endgrouptag)
+
+        (:startgrouptag)
+        ("berlin")
+        (:grouptags)
+        ("campus")
+        (:endgrouptag)
+
+        (:startgrouptag)
+        ("campus")
+        (:grouptags)
+        ("fablab")
         (:endgrouptag)))
 
 (provide 'vv-org-tags)
